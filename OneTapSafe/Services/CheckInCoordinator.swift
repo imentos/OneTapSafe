@@ -24,18 +24,22 @@ final class CheckInCoordinator: ObservableObject {
         let reminderTime = DataStore.shared.dailyReminderTime
         let deadline = Calendar.current.date(byAdding: .hour, value: 8, to: reminderTime) ?? Date()
         
-        // Start Live Activity
+        // Primary: Start Live Activity (more prominent and interactive)
         if #available(iOS 16.1, *) {
             LiveActivityManager.shared.startActivity(deadline: deadline)
+            print("✅ Live Activity started as primary check-in mechanism")
         }
         
-        // Send notification reminder
+        // Fallback: Send notification reminder (only if Live Activity fails)
+        // This ensures users without Live Activities enabled still get reminders
         NotificationManager.shared.scheduleDailyReminder(at: reminderTime)
         
         isCheckInDue = true
         missedCheckIn = false
         
         print("✅ Daily check-in started with deadline: \(deadline)")
+        print("   - Primary: Live Activity on Lock Screen")
+        print("   - Fallback: Local notification")
     }
     
     // MARK: - Handle Check-In Completion

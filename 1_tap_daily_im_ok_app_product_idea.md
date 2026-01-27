@@ -1,9 +1,9 @@
-# One Tap Safe (iOS)
+# One Tap OK (iOS)
 
 ## One‑Line Pitch
-A privacy‑first iOS app that lets users confirm they're safe with **one tap per day**, directly from **Lock Screen / Dynamic Island using Live Activities**, and alerts trusted contacts only if a check‑in is missed.
+A privacy‑first iOS app that lets users confirm they're OK with **one tap per day**, directly from **Lock Screen / Dynamic Island using Live Activities**, and alerts trusted contacts only if a check‑in is missed.
 
-**App Name:** One Tap Safe  
+**App Name:** One Tap OK  
 **Subtitle:** Lock Screen Daily Check-In
 
 ---
@@ -93,7 +93,7 @@ Expected pricing:
 
 ## ASO Strategy
 ### Core Keywords
-- one tap safe
+- one tap ok
 - one tap check in
 - lock screen check in
 - daily safety check

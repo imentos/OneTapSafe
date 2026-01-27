@@ -11,10 +11,10 @@ import SwiftUI
 struct OneTapSafeApp: App {
     
     init() {
-        // Setup notifications
+        // Setup notifications as fallback
         NotificationManager.shared.setupNotificationCategories()
         
-        // Request authorization
+        // Request notification authorization (fallback only)
         Task {
             await NotificationManager.shared.requestAuthorization()
         }
@@ -27,7 +27,10 @@ struct OneTapSafeApp: App {
         WindowGroup {
             ContentView()
                 .onAppear {
-                    // Schedule daily reminder if enabled
+                    // Start Live Activity immediately on first launch to show user how it works
+                    startLiveActivityOnFirstLaunch()
+                    
+                    // Schedule notifications only as fallback (not primary mechanism)
                     if DataStore.shared.reminderEnabled {
                         NotificationManager.shared.scheduleDailyReminder(
                             at: DataStore.shared.dailyReminderTime
@@ -41,10 +44,25 @@ struct OneTapSafeApp: App {
     }
     
     @available(iOS 16.1, *)
+    private func startLiveActivityOnFirstLaunch() {
+        // On first launch, immediately start Live Activity to demonstrate the feature
+        guard DataStore.shared.lastCheckInDate == nil else {
+            return // Not first launch
+        }
+        
+        print("🎉 First app launch - starting Live Activity demo")
+        
+        // Calculate deadline (8 hours from now)
+        let deadline = Calendar.current.date(byAdding: .hour, value: 8, to: Date()) ?? Date()
+        
+        // Start Live Activity
+        LiveActivityManager.shared.startActivity(deadline: deadline, userName: "You")
+    }
+    
+    @available(iOS 16.1, *)
     private func startLiveActivityIfNeeded() {
-        // Don't check on first app launch (no check-in history exists)
+        // Don't check on first app launch (handled by startLiveActivityOnFirstLaunch)
         guard DataStore.shared.lastCheckInDate != nil else {
-            print("ℹ️ First app launch - skipping Live Activity start")
             return
         }
         

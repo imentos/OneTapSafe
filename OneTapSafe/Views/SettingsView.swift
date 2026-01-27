@@ -84,8 +84,7 @@ struct SettingsView: View {
                     }
                     .buttonStyle(.plain)
                     
-                    Link("Privacy Policy", destination: URL(string: "https://example.com/privacy")!)
-                    Link("Terms of Service", destination: URL(string: "https://example.com/terms")!)
+                    Link("Privacy Policy", destination: URL(string: "https://amazing-grade-53d.notion.site/Privacy-Policy-for-One-Tap-OK-2f041a36ce8d80408074e2de77426830")!)
                 }
                 
                 if showDebugSection {

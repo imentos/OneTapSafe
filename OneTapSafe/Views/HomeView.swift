@@ -4,10 +4,12 @@
 //
 
 import SwiftUI
+import ActivityKit
 
 struct HomeView: View {
     @StateObject private var dataStore = DataStore.shared
     @State private var showingCheckInSuccess = false
+    @State private var showLiveActivityBanner = false
     
     var hasCheckedInToday: Bool {
         dataStore.hasCheckedInToday()
@@ -17,6 +19,11 @@ struct HomeView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 24) {
+                    // Live Activity Setup Banner (if not enabled)
+                    if #available(iOS 16.1, *), showLiveActivityBanner {
+                        LiveActivitySetupBanner()
+                    }
+                    
                     // Status Card
                     StatusCard(hasCheckedIn: hasCheckedInToday)
                     
@@ -41,7 +48,16 @@ struct HomeView: View {
             } message: {
                 Text("Your safety check-in has been recorded. See you tomorrow!")
             }
+            .onAppear {
+                checkLiveActivityStatus()
+            }
         }
+    }
+    
+    @available(iOS 16.1, *)
+    private func checkLiveActivityStatus() {
+        let authInfo = ActivityAuthorizationInfo()
+        showLiveActivityBanner = !authInfo.areActivitiesEnabled
     }
     
     private func checkIn() {
@@ -52,6 +68,61 @@ struct HomeView: View {
         if #available(iOS 16.1, *) {
             LiveActivityManager.shared.endActivity()
         }
+    }
+}
+
+// MARK: - Live Activity Setup Banner
+
+@available(iOS 16.1, *)
+struct LiveActivitySetupBanner: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 12) {
+                Image(systemName: "sparkles")
+                    .foregroundColor(.blue)
+                    .font(.title3)
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Enable Live Activities")
+                        .font(.headline)
+                    Text("Check in directly from your Lock Screen")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+            }
+            
+            Button {
+                if let url = URL(string: UIApplication.openSettingsURLString) {
+                    UIApplication.shared.open(url)
+                }
+            } label: {
+                HStack {
+                    Image(systemName: "gear")
+                    Text("Open Settings")
+                }
+                .font(.subheadline)
+                .foregroundColor(.white)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+                .background(Color.blue)
+                .cornerRadius(8)
+            }
+            
+            Text("Go to Settings > One Tap Safe > Enable Live Activities")
+                .font(.caption2)
+                .foregroundColor(.secondary)
+                .padding(.top, 4)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding()
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color.blue.opacity(0.1))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(Color.blue.opacity(0.3), lineWidth: 1)
+                )
+        )
     }
 }
 

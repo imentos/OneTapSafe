@@ -27,7 +27,9 @@ final class LiveActivityManager {
         print("   - Frequent Pushes Enabled: \(authInfo.frequentPushesEnabled)")
         
         guard authInfo.areActivitiesEnabled else {
-            print("❌ Live Activities not enabled - Go to Settings > One Tap Safe > Enable Live Activities")
+            print("⚠️ Live Activities not enabled")
+            print("   → User needs to: Settings > One Tap Safe > Enable Live Activities")
+            print("   → Fallback: Local notifications will be used instead")
             return
         }
         
@@ -43,13 +45,16 @@ final class LiveActivityManager {
                 contentState: contentState,
                 pushType: nil
             )
-            print("✅ Live Activity started with deadline: \(deadline)")
+            print("✅ Live Activity started successfully!")
             print("   - Activity ID: \(currentActivity?.id ?? "unknown")")
             print("   - Activity State: \(String(describing: currentActivity?.activityState))")
-            print("👉 LOCK YOUR PHONE to see the Live Activity on lock screen")
+            print("   - Deadline: \(deadline)")
+            print("👉 LOCK YOUR PHONE to see the Live Activity on your Lock Screen")
+            print("   You can check in by tapping 'I'm OK' button directly from Lock Screen")
         } catch {
             print("❌ Failed to start Live Activity: \(error)")
             print("   - Error details: \(error.localizedDescription)")
+            print("   → Fallback: Local notifications will be used instead")
         }
     }
     
