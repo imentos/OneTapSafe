@@ -55,6 +55,12 @@ struct OneTapSafeApp: App {
             return // Not first launch
         }
         
+        // Respect reminder setting
+        guard DataStore.shared.reminderEnabled else {
+            print("ℹ️ Reminders disabled - skipping Live Activity")
+            return
+        }
+        
         print("🎉 First app launch - starting Live Activity demo")
         
         // Calculate deadline (8 hours from now)
@@ -68,6 +74,12 @@ struct OneTapSafeApp: App {
     private func startLiveActivityIfNeeded() {
         // Don't check on first app launch (handled by startLiveActivityOnFirstLaunch)
         guard DataStore.shared.lastCheckInDate != nil else {
+            return
+        }
+        
+        // Respect reminder setting - if disabled, don't show Live Activity
+        guard DataStore.shared.reminderEnabled else {
+            print("ℹ️ Reminders disabled - skipping Live Activity")
             return
         }
         
