@@ -166,11 +166,8 @@ extension NotificationManager: UNUserNotificationCenterDelegate {
         willPresent notification: UNNotification,
         withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
     ) {
-        // Start Live Activity when daily reminder is delivered
-        if notification.request.identifier == "dailyReminder" || notification.request.identifier == "testReminder" {
-            startLiveActivityForReminder()
-        }
-        
+        // Live Activity should already be running proactively
+        // No need to start it here
         completionHandler([.banner, .sound])
     }
     
@@ -182,14 +179,11 @@ extension NotificationManager: UNUserNotificationCenterDelegate {
     ) {
         print("🔔 Notification tapped: \(response.notification.request.identifier)")
         
-        // Start Live Activity when user taps the notification
-        if response.notification.request.identifier == "dailyReminder" || response.notification.request.identifier == "testReminder" {
-            print("🔔 Starting Live Activity from notification tap...")
-            startLiveActivityForReminder()
-        }
+        // Live Activity should already be running proactively
+        // User can check in directly from Lock Screen Live Activity
         
         if response.actionIdentifier == "CHECK_IN_ACTION" {
-            // User tapped "I'm OK" action
+            // User tapped "I'm OK" action button from notification
             print("🔔 User tapped 'I'm OK' action button")
             DataStore.shared.recordCheckIn(method: .notification)
             if #available(iOS 16.1, *) {
@@ -200,8 +194,9 @@ extension NotificationManager: UNUserNotificationCenterDelegate {
         completionHandler()
     }
     
-    // MARK: - Helper
+    // MARK: - Helper (deprecated - Live Activity now starts proactively)
     
+    @available(*, deprecated, message: "Live Activity now starts proactively, not from notifications")
     private func startLiveActivityForReminder() {
         if #available(iOS 16.1, *) {
             // Calculate deadline (8 hours from now)

@@ -24,22 +24,27 @@ final class CheckInCoordinator: ObservableObject {
         let reminderTime = DataStore.shared.dailyReminderTime
         let deadline = Calendar.current.date(byAdding: .hour, value: 8, to: reminderTime) ?? Date()
         
-        // Primary: Start Live Activity (more prominent and interactive)
+        // Primary: Start Live Activity immediately (proactive approach)
+        // This ensures Live Activity is already visible before reminder time
+        // User will see countdown on Lock Screen without needing to open the app
         if #available(iOS 16.1, *) {
             LiveActivityManager.shared.startActivity(deadline: deadline)
-            print("✅ Live Activity started as primary check-in mechanism")
+            print("✅ Live Activity started proactively")
+            print("   - Deadline: \(deadline)")
+            print("   - User can check in from Lock Screen anytime")
         }
         
-        // Fallback: Send notification reminder (only if Live Activity fails)
-        // This ensures users without Live Activities enabled still get reminders
+        // Fallback: Schedule notification as backup reminder
+        // This fires at reminder time as an additional prompt
+        // But Live Activity is already running by this point
         NotificationManager.shared.scheduleDailyReminder(at: reminderTime)
         
         isCheckInDue = true
         missedCheckIn = false
         
-        print("✅ Daily check-in started with deadline: \(deadline)")
-        print("   - Primary: Live Activity on Lock Screen")
-        print("   - Fallback: Local notification")
+        print("✅ Daily check-in flow initiated")
+        print("   - Primary: Live Activity (already visible)")
+        print("   - Backup: Notification at \(reminderTime)")
     }
     
     // MARK: - Handle Check-In Completion

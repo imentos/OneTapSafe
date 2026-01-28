@@ -27,17 +27,22 @@ struct OneTapSafeApp: App {
         WindowGroup {
             ContentView()
                 .onAppear {
-                    // Start Live Activity immediately on first launch to show user how it works
+                    // PROACTIVE LIVE ACTIVITY STRATEGY:
+                    // Live Activity starts BEFORE notification fires, so it's already
+                    // visible on Lock Screen when reminder time arrives.
+                    // User doesn't need to tap notification to see check-in UI.
+                    
+                    // 1. First launch: Start demo Live Activity immediately
                     startLiveActivityOnFirstLaunch()
                     
-                    // Schedule notifications only as fallback (not primary mechanism)
+                    // 2. Schedule backup notification (fires at reminder time)
                     if DataStore.shared.reminderEnabled {
                         NotificationManager.shared.scheduleDailyReminder(
                             at: DataStore.shared.dailyReminderTime
                         )
                     }
                     
-                    // Auto-start Live Activity if check-in needed
+                    // 3. Auto-restart Live Activity if app opens and check-in is due
                     startLiveActivityIfNeeded()
                 }
         }
