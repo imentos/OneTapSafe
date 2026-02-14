@@ -33,11 +33,12 @@ final class NotificationManager: NSObject {
     // MARK: - Daily Reminder
     
     func scheduleDailyReminder(at time: Date) {
-        // Cancel existing reminder
-        center.removePendingNotificationRequests(withIdentifiers: ["dailyReminder"])
+        // Cancel existing reminders
+        center.removePendingNotificationRequests(withIdentifiers: ["dailyReminder", "deadlineCheck"])
         
         let components = Calendar.current.dateComponents([.hour, .minute], from: time)
         
+        // 1. Schedule the daily reminder notification
         let content = UNMutableNotificationContent()
         content.title = "Daily Safety Check-In"
         content.body = "Tap to confirm you're safe today"
@@ -59,11 +60,45 @@ final class NotificationManager: NSObject {
                 print("✅ Daily reminder scheduled for \(time)")
             }
         }
+        
+        // 2. Schedule deadline check notification (8 hours after reminder)
+        // This ensures contacts get notified even if user doesn't open the app
+        var deadlineComponents = components
+        if let hour = components.hour {
+            deadlineComponents.hour = (hour + 8) % 24  // Add 8 hours, wrap around if needed
+        }
+        
+        let deadlineTrigger = UNCalendarNotificationTrigger(dateMatching: deadlineComponents, repeats: true)
+        
+        let deadlineRequest = UNNotificationRequest(
+            identifier: "deadlineCheck",
+            content: createMissedCheckInNotificationContent(),
+            trigger: deadlineTrigger
+        )
+        
+        center.add(deadlineRequest) { error in
+            if let error = error {
+                print("❌ Failed to schedule deadline check: \(error)")
+            } else {
+                print("✅ Deadline check scheduled for 8 hours after reminder")
+            }
+        }
     }
     
     func cancelDailyReminder() {
-        center.removePendingNotificationRequests(withIdentifiers: ["dailyReminder"])
-        print("✅ Daily reminder cancelled")
+        center.removePendingNotificationRequests(withIdentifiers: ["dailyReminder", "deadlineCheck"])
+        print("✅ Daily reminder and deadline check cancelled")
+    }
+    
+    // MARK: - Missed Check-In Notification Content
+    
+    private func createMissedCheckInNotificationContent() -> UNMutableNotificationContent {
+        let content = UNMutableNotificationContent()
+        content.title = "⚠️ Check-In Missed"
+        content.body = "You haven't checked in today. Your emergency contacts will be notified soon."
+        content.sound = .defaultCritical
+        content.categoryIdentifier = "DEADLINE_CATEGORY"
+        return content
     }
     
     // MARK: - Test Notification
@@ -93,19 +128,14 @@ final class NotificationManager: NSObject {
         }
     }
     
-    // MARK: - Missed Check-In Alert
+    // MARK: - Missed Check-In Alert (for manual triggers)
     
     func sendMissedCheckInNotification() {
-        let content = UNMutableNotificationContent()
-        content.title = "⚠️ Check-In Missed"
-        content.body = "You haven't checked in today. Your emergency contacts will be notified soon."
-        content.sound = .defaultCritical
-        
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
         
         let request = UNNotificationRequest(
             identifier: "missedCheckIn",
-            content: content,
+            content: createMissedCheckInNotificationContent(),
             trigger: trigger
         )
         
@@ -166,6 +196,12 @@ extension NotificationManager: UNUserNotificationCenterDelegate {
         willPresent notification: UNNotification,
         withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
     ) {
+        // Check if this is the deadline notification
+        if notification.request.identifier == "deadlineCheck" {
+            print("⏰ Deadline notification triggered - checking for missed check-in")
+            CheckInCoordinator.shared.checkMissedCheckInStatus(fromScheduledNotification: true)
+        }
+        
         // Live Activity should already be running proactively
         // No need to start it here
         completionHandler([.banner, .sound])
@@ -178,6 +214,12 @@ extension NotificationManager: UNUserNotificationCenterDelegate {
         withCompletionHandler completionHandler: @escaping () -> Void
     ) {
         print("🔔 Notification tapped: \(response.notification.request.identifier)")
+        
+        // Check if this is the deadline notification
+        if response.notification.request.identifier == "deadlineCheck" {
+            print("⏰ Deadline notification tapped - checking for missed check-in")
+            CheckInCoordinator.shared.checkMissedCheckInStatus(fromScheduledNotification: true)
+        }
         
         // Live Activity should already be running proactively
         // User can check in directly from Lock Screen Live Activity

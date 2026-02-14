@@ -42,7 +42,7 @@ struct HomeView: View {
                 }
                 .padding()
             }
-            .navigationTitle("One Tap Safe")
+            .navigationTitle("OneTap OK")
             .alert("Check-In Recorded", isPresented: $showingCheckInSuccess) {
                 Button("OK", role: .cancel) {}
             } message: {
@@ -108,7 +108,7 @@ struct LiveActivitySetupBanner: View {
                 .cornerRadius(8)
             }
             
-            Text("Go to Settings > One Tap Safe > Enable Live Activities")
+            Text("Go to Settings > OneTap OK > Enable Live Activities")
                 .font(.caption2)
                 .foregroundColor(.secondary)
                 .padding(.top, 4)
@@ -251,9 +251,10 @@ struct ContactSummaryCard: View {
                         Text(contact.name)
                             .font(.subheadline)
                         Spacer()
-                        Text(contact.phoneNumber)
+                        Text(contact.email)
                             .font(.caption)
                             .foregroundColor(.secondary)
+                            .lineLimit(1)
                     }
                 }
                 

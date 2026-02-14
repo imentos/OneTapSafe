@@ -19,24 +19,24 @@ struct EditContactView: View {
     init(contact: TrustedContact) {
         self.contact = contact
         _name = State(initialValue: contact.name)
-        _phoneNumber = State(initialValue: contact.phoneNumber)
-        _email = State(initialValue: contact.email ?? "")
+        _phoneNumber = State(initialValue: contact.phoneNumber ?? "")
+        _email = State(initialValue: contact.email)
         _notificationMethod = State(initialValue: contact.notificationMethod)
     }
     
     var isValid: Bool {
-        !name.isEmpty && !phoneNumber.isEmpty
+        !name.isEmpty && !email.isEmpty
     }
     
     var body: some View {
         Form {
             Section("Contact Information") {
                 TextField("Name", text: $name)
-                TextField("Phone Number", text: $phoneNumber)
-                    .keyboardType(.phonePad)
-                TextField("Email (Optional)", text: $email)
+                TextField("Email", text: $email)
                     .keyboardType(.emailAddress)
                     .textInputAutocapitalization(.never)
+                TextField("Phone Number (Optional)", text: $phoneNumber)
+                    .keyboardType(.phonePad)
             }
             
             Section("Notification Method") {
@@ -64,8 +64,8 @@ struct EditContactView: View {
         let updatedContact = TrustedContact(
             id: contact.id,
             name: name,
-            phoneNumber: phoneNumber,
-            email: email.isEmpty ? nil : email,
+            phoneNumber: phoneNumber.isEmpty ? nil : phoneNumber,
+            email: email,
             notificationMethod: notificationMethod
         )
         dataStore.updateContact(updatedContact)

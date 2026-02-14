@@ -65,7 +65,7 @@ final class CheckInCoordinator: ObservableObject {
     
     // MARK: - Handle Missed Check-In
     
-    func handleMissedCheckIn() {
+    func handleMissedCheckIn(fromScheduledNotification: Bool = false) {
         guard !DataStore.shared.hasCheckedInToday() else {
             print("ℹ️ Check-in already completed today")
             return
@@ -79,8 +79,10 @@ final class CheckInCoordinator: ObservableObject {
         
         missedCheckIn = true
         
-        // Send alert notification to user
-        NotificationManager.shared.sendMissedCheckInNotification()
+        // Send user notification (skip if deadline notification already showed it)
+        if !fromScheduledNotification {
+            NotificationManager.shared.sendMissedCheckInNotification()
+        }
         
         // Update Live Activity to show overdue
         if #available(iOS 16.1, *) {
@@ -100,7 +102,7 @@ final class CheckInCoordinator: ObservableObject {
     
     // MARK: - Check Status
     
-    func checkMissedCheckInStatus() {
+    func checkMissedCheckInStatus(forceTest: Bool = false, fromScheduledNotification: Bool = false) {
         // Don't check on first app launch (no check-in history exists)
         guard DataStore.shared.lastCheckInDate != nil else {
             print("ℹ️ First app launch - skipping missed check-in check")
@@ -110,8 +112,15 @@ final class CheckInCoordinator: ObservableObject {
         // Check if user should have checked in today but hasn't
         let hasCheckedIn = DataStore.shared.hasCheckedInToday()
         
-        if !hasCheckedIn && shouldHaveCheckedInByNow() {
+        // For testing: skip deadline check and force notification
+        if forceTest {
+            print("🧪 Test mode: Forcing missed check-in notification")
             handleMissedCheckIn()
+            return
+        }
+        
+        if !hasCheckedIn && shouldHaveCheckedInByNow() {
+            handleMissedCheckIn(fromScheduledNotification: fromScheduledNotification)
         }
     }
     

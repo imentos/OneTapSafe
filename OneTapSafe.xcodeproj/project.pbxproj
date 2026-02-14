@@ -37,6 +37,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		B30D3B1E2F4033BE00A06F26 /* OneTapSafe.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = OneTapSafe.storekit; sourceTree = "<group>"; };
 		B32E747C2F1ECD6F0093E016 /* OneTapSafe.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OneTapSafe.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B32E74B42F1EFADE0093E016 /* OneTapSafeWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OneTapSafeWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		B32E74B62F1EFADE0093E016 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
@@ -115,6 +116,7 @@
 		B32E74732F1ECD6F0093E016 = {
 			isa = PBXGroup;
 			children = (
+				B30D3B1E2F4033BE00A06F26 /* OneTapSafe.storekit */,
 				B32E747E2F1ECD6F0093E016 /* OneTapSafe */,
 				B32E74BA2F1EFADE0093E016 /* OneTapSafeWidget */,
 				B32E74B52F1EFADE0093E016 /* Frameworks */,
@@ -401,7 +403,7 @@
 				DEVELOPMENT_TEAM = 2HQJC64KR8;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "One Tap OK";
+				INFOPLIST_KEY_CFBundleDisplayName = "OneTap OK";
 				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -412,7 +414,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = rkuo.OneTapSafe;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -446,7 +448,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = rkuo.OneTapSafe;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;

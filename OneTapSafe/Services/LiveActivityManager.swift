@@ -28,7 +28,7 @@ final class LiveActivityManager {
         
         guard authInfo.areActivitiesEnabled else {
             print("⚠️ Live Activities not enabled")
-            print("   → User needs to: Settings > One Tap Safe > Enable Live Activities")
+            print("   → User needs to: Settings > OneTap OK > Enable Live Activities")
             print("   → Fallback: Local notifications will be used instead")
             return
         }

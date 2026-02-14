@@ -68,20 +68,20 @@ struct ContactRow: View {
                 .font(.headline)
             
             HStack {
-                Image(systemName: "phone.fill")
+                Image(systemName: "envelope.fill")
                     .foregroundColor(.green)
                     .font(.caption)
-                Text(contact.phoneNumber)
+                Text(contact.email)
                     .font(.subheadline)
                     .foregroundColor(.secondary)
             }
             
-            if let email = contact.email, !email.isEmpty {
+            if let phoneNumber = contact.phoneNumber, !phoneNumber.isEmpty {
                 HStack {
-                    Image(systemName: "envelope.fill")
+                    Image(systemName: "phone.fill")
                         .foregroundColor(.green)
                         .font(.caption)
-                    Text(email)
+                    Text(phoneNumber)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }

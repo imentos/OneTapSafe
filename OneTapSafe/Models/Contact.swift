@@ -8,11 +8,11 @@ import Foundation
 struct TrustedContact: Identifiable, Codable {
     let id: UUID
     var name: String
-    var phoneNumber: String
-    var email: String?
+    var phoneNumber: String?
+    var email: String
     var notificationMethod: NotificationMethod
     
-    init(id: UUID = UUID(), name: String, phoneNumber: String, email: String? = nil, notificationMethod: NotificationMethod = .sms) {
+    init(id: UUID = UUID(), name: String, phoneNumber: String? = nil, email: String, notificationMethod: NotificationMethod = .email) {
         self.id = id
         self.name = name
         self.phoneNumber = phoneNumber

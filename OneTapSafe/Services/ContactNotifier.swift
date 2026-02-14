@@ -11,8 +11,8 @@ final class ContactNotifier {
     static let shared = ContactNotifier()
     
     // Configuration for automated notifications
-    private let automatedNotificationsEnabled = false
-    private let notificationWebhookURL = "https://your-server.com/api/notify" // TODO: Replace with actual server
+    private let automatedNotificationsEnabled = true
+    private let emailServerURL = "https://onetapsafe-email-server-production.up.railway.app/api/send-alert"
     
     private init() {}
     
@@ -40,58 +40,36 @@ final class ContactNotifier {
     // MARK: - Automated Notifications (Server-based)
     
     private func sendAutomatedNotifications(contacts: [TrustedContact], missedCheckIn: Date) {
-        let message = createAlertMessage(missedCheckIn: missedCheckIn)
+        let userName = "OneTap OK User" // Could be customized in settings later
         
-        // Prepare notification requests for all contacts
-        var notificationRequests: [[String: Any]] = []
+        let formatter = DateFormatter()
+        formatter.dateStyle = .long
+        formatter.timeStyle = .short
+        let missedTimeString = formatter.string(from: missedCheckIn)
         
         for contact in contacts {
-            print("📞 Preparing automated notification for: \(contact.name)")
+            print("📞 Sending automated notification to: \(contact.name)")
             
-            var request: [String: Any] = [
-                "contactName": contact.name,
-                "message": message,
-                "timestamp": ISO8601DateFormatter().string(from: missedCheckIn)
-            ]
+            // Send emails (now always available since email is required)
+            sendEmailNotification(
+                to: contact.email,
+                contactName: contact.name,
+                userName: userName,
+                missedCheckIn: missedTimeString
+            )
             
-            switch contact.notificationMethod {
-            case .sms:
-                request["type"] = "sms"
-                request["phone"] = contact.phoneNumber
-            case .email:
-                request["type"] = "email"
-                request["email"] = contact.email ?? ""
-            case .both:
-                // Send both SMS and email
-                notificationRequests.append([
-                    "contactName": contact.name,
-                    "type": "sms",
-                    "phone": contact.phoneNumber,
-                    "message": message,
-                    "timestamp": ISO8601DateFormatter().string(from: missedCheckIn)
-                ])
-                if let email = contact.email {
-                    request["type"] = "email"
-                    request["email"] = email
+            // For SMS, check if phone number is available
+            if contact.notificationMethod == .sms || contact.notificationMethod == .both {
+                if let phoneNumber = contact.phoneNumber, !phoneNumber.isEmpty {
+                    sendSMS(to: contact, missedCheckIn: missedCheckIn)
                 }
             }
-            
-            notificationRequests.append(request)
-        }
-        
-        // Send to server
-        sendToServer(notificationRequests)
-        
-        // Notify user
-        for contact in contacts {
-            NotificationManager.shared.sendContactNotifiedAlert(contactName: contact.name)
         }
     }
     
-    private func sendToServer(_ requests: [[String: Any]]) {
-        guard let url = URL(string: notificationWebhookURL) else {
-            print("❌ Invalid webhook URL")
-            fallbackToManualNotifications()
+    private func sendEmailNotification(to email: String, contactName: String, userName: String, missedCheckIn: String) {
+        guard let url = URL(string: emailServerURL) else {
+            print("❌ Invalid email server URL")
             return
         }
         
@@ -99,33 +77,35 @@ final class ContactNotifier {
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
-        let payload: [String: Any] = [
-            "notifications": requests,
-            "userId": UIDevice.current.identifierForVendor?.uuidString ?? "unknown"
+        let payload: [String: String] = [
+            "email": email,
+            "contactName": contactName,
+            "userName": userName,
+            "missedCheckIn": missedCheckIn
         ]
         
         do {
-            request.httpBody = try JSONSerialization.data(withJSONObject: payload)
+            request.httpBody = try JSONEncoder().encode(payload)
             
             URLSession.shared.dataTask(with: request) { data, response, error in
                 if let error = error {
-                    print("❌ Failed to send notifications: \(error.localizedDescription)")
-                    self.fallbackToManualNotifications()
+                    print("❌ Failed to send email to \(contactName): \(error.localizedDescription)")
                     return
                 }
                 
                 if let httpResponse = response as? HTTPURLResponse {
                     if httpResponse.statusCode == 200 {
-                        print("✅ Automated notifications sent successfully")
+                        print("✅ Email sent successfully to \(contactName)")
+                        DispatchQueue.main.async {
+                            NotificationManager.shared.sendContactNotifiedAlert(contactName: contactName)
+                        }
                     } else {
-                        print("❌ Server error: \(httpResponse.statusCode)")
-                        self.fallbackToManualNotifications()
+                        print("❌ Server error \(httpResponse.statusCode) sending email to \(contactName)")
                     }
                 }
             }.resume()
         } catch {
-            print("❌ Failed to encode notification payload: \(error)")
-            fallbackToManualNotifications()
+            print("❌ Failed to encode email payload: \(error)")
         }
     }
     
@@ -137,16 +117,16 @@ final class ContactNotifier {
             
             switch contact.notificationMethod {
             case .sms:
-                sendSMS(to: contact, missedCheckIn: missedCheckIn)
+                if let phoneNumber = contact.phoneNumber, !phoneNumber.isEmpty {
+                    sendSMS(to: contact, missedCheckIn: missedCheckIn)
+                }
             case .email:
-                if let email = contact.email {
-                    sendEmail(to: contact, email: email, missedCheckIn: missedCheckIn)
-                }
+                sendEmail(to: contact, email: contact.email, missedCheckIn: missedCheckIn)
             case .both:
-                sendSMS(to: contact, missedCheckIn: missedCheckIn)
-                if let email = contact.email {
-                    sendEmail(to: contact, email: email, missedCheckIn: missedCheckIn)
+                if let phoneNumber = contact.phoneNumber, !phoneNumber.isEmpty {
+                    sendSMS(to: contact, missedCheckIn: missedCheckIn)
                 }
+                sendEmail(to: contact, email: contact.email, missedCheckIn: missedCheckIn)
             }
             
             NotificationManager.shared.sendContactNotifiedAlert(contactName: contact.name)
@@ -163,10 +143,15 @@ final class ContactNotifier {
     // MARK: - SMS
     
     private func sendSMS(to contact: TrustedContact, missedCheckIn: Date) {
+        guard let phoneNumber = contact.phoneNumber, !phoneNumber.isEmpty else {
+            print("⚠️ No phone number for contact: \(contact.name)")
+            return
+        }
+        
         let message = createAlertMessage(missedCheckIn: missedCheckIn)
         
         // Clean phone number (remove any formatting)
-        let cleanPhone = contact.phoneNumber.replacingOccurrences(of: "[^0-9+]", with: "", options: .regularExpression)
+        let cleanPhone = phoneNumber.replacingOccurrences(of: "[^0-9+]", with: "", options: .regularExpression)
         
         // Build SMS URL with proper encoding
         let urlString = "sms:\(cleanPhone)?body=\(message.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")"
@@ -232,7 +217,7 @@ final class ContactNotifier {
         
         Please reach out to confirm they are safe.
         
-        - Sent by One Tap Safe
+        - Sent by OneTap OK
         """
     }
 }

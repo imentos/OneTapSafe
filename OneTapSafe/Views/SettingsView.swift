@@ -7,13 +7,62 @@ import SwiftUI
 
 struct SettingsView: View {
     @StateObject private var dataStore = DataStore.shared
+    @StateObject private var subscriptionManager = SubscriptionManager.shared
     @State private var showingResetAlert = false
+    @State private var showPaywall = false
     @State private var versionTapCount = 0
     @State private var showDebugSection = false
     
     var body: some View {
         NavigationStack {
             Form {
+                // Pro Status / Upgrade Section - DISABLED FOR NOW
+                // TODO: Re-enable when ready to monetize
+                /*
+                if subscriptionManager.isPro {
+                    Section {
+                        HStack {
+                            Image(systemName: "star.circle.fill")
+                                .foregroundStyle(.green.gradient)
+                                .font(.title2)
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("OneTap OK Pro")
+                                    .font(.headline)
+                                Text("You have access to all premium features")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                            Spacer()
+                        }
+                        .padding(.vertical, 4)
+                    }
+                } else {
+                    Section {
+                        Button(action: { showPaywall = true }) {
+                            HStack {
+                                VStack(alignment: .leading, spacing: 6) {
+                                    HStack {
+                                        Image(systemName: "star.fill")
+                                            .foregroundColor(.green)
+                                        Text("Upgrade to Pro")
+                                            .font(.headline)
+                                            .foregroundColor(.primary)
+                                    }
+                                    Text("Unlimited contacts & premium features")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                                Spacer()
+                                Image(systemName: "chevron.right")
+                                    .foregroundColor(.secondary)
+                                    .font(.caption)
+                            }
+                            .padding(.vertical, 4)
+                        }
+                    }
+                }
+                */
+                
                 Section("Daily Reminder") {
                     Toggle("Enable Reminder", isOn: Binding(
                         get: { dataStore.reminderEnabled },
@@ -98,6 +147,9 @@ struct SettingsView: View {
                 }
             }
             .navigationTitle("Settings")
+            .sheet(isPresented: $showPaywall) {
+                PaywallView()
+            }
             .alert("Reset All Data?", isPresented: $showingResetAlert) {
                 Button("Cancel", role: .cancel) {}
                 Button("Reset", role: .destructive) {
@@ -146,10 +198,10 @@ struct SettingsView: View {
         // Use last check-in date or yesterday if none exists
         let lastCheckIn = DataStore.shared.lastCheckInDate ?? Calendar.current.date(byAdding: .day, value: -1, to: Date())!
         
-        // Trigger missed check-in notification
-        CheckInCoordinator.shared.handleMissedCheckIn()
+        // Trigger missed check-in notification with forceTest flag
+        CheckInCoordinator.shared.checkMissedCheckInStatus(forceTest: true)
         
-        print("🧪 Check your Messages app for SMS from emergency contacts")
+        print("🧪 Check your email for notifications from emergency contacts")
     }
 }
 

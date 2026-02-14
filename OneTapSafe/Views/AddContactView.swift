@@ -8,26 +8,67 @@ import SwiftUI
 struct AddContactView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var dataStore = DataStore.shared
+    @StateObject private var subscriptionManager = SubscriptionManager.shared
     
     @State private var name = ""
     @State private var phoneNumber = ""
     @State private var email = ""
-    @State private var notificationMethod: NotificationMethod = .sms
+    @State private var notificationMethod: NotificationMethod = .email
+    @State private var showPaywall = false
+    @State private var showLimitAlert = false
     
     var isValid: Bool {
-        !name.isEmpty && !phoneNumber.isEmpty
+        !name.isEmpty && !email.isEmpty
+    }
+    
+    var canAddContact: Bool {
+        subscriptionManager.canAddContact(currentCount: dataStore.trustedContacts.count)
     }
     
     var body: some View {
         NavigationStack {
             Form {
+                // Contact limit warning for free users
+                if !canAddContact {
+                    Section {
+                        VStack(spacing: 12) {
+                            Image(systemName: "person.2.badge.gearshape.fill")
+                                .font(.system(size: 48))
+                                .foregroundStyle(.green.gradient)
+                            
+                            Text("Contact Limit Reached")
+                                .font(.headline)
+                            
+                            Text("Free users can add 1 emergency contact. Upgrade to Pro for unlimited contacts and premium features.")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                                .multilineTextAlignment(.center)
+                            
+                            Button(action: { showPaywall = true }) {
+                                Text("Upgrade to Pro")
+                                    .font(.headline)
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
+                                    .background(Color.green)
+                                    .foregroundColor(.white)
+                                    .cornerRadius(12)
+                            }
+                        }
+                        .padding(.vertical)
+                        .frame(maxWidth: .infinity)
+                    }
+                }
+                
                 Section("Contact Information") {
                     TextField("Name", text: $name)
-                    TextField("Phone Number", text: $phoneNumber)
-                        .keyboardType(.phonePad)
-                    TextField("Email (Optional)", text: $email)
+                        .disabled(!canAddContact)
+                    TextField("Email", text: $email)
                         .keyboardType(.emailAddress)
                         .textInputAutocapitalization(.never)
+                        .disabled(!canAddContact)
+                    TextField("Phone Number (Optional)", text: $phoneNumber)
+                        .keyboardType(.phonePad)
+                        .disabled(!canAddContact)
                 }
                 
                 Section("Notification Method") {
@@ -37,6 +78,7 @@ struct AddContactView: View {
                         }
                     }
                     .pickerStyle(.segmented)
+                    .disabled(!canAddContact)
                 }
                 
                 Section {
@@ -58,8 +100,11 @@ struct AddContactView: View {
                     Button("Add") {
                         addContact()
                     }
-                    .disabled(!isValid)
+                    .disabled(!isValid || !canAddContact)
                 }
+            }
+            .sheet(isPresented: $showPaywall) {
+                PaywallView()
             }
         }
     }
@@ -67,8 +112,8 @@ struct AddContactView: View {
     private func addContact() {
         let contact = TrustedContact(
             name: name,
-            phoneNumber: phoneNumber,
-            email: email.isEmpty ? nil : email,
+            phoneNumber: phoneNumber.isEmpty ? nil : phoneNumber,
+            email: email,
             notificationMethod: notificationMethod
         )
         dataStore.addContact(contact)
