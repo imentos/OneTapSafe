@@ -196,14 +196,20 @@ extension NotificationManager: UNUserNotificationCenterDelegate {
         willPresent notification: UNNotification,
         withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
     ) {
+        print("🔔 Notification will present: \(notification.request.identifier)")
+        
+        // START LIVE ACTIVITY when daily reminder notification appears
+        if notification.request.identifier == "dailyReminder" {
+            print("⏰ Daily reminder notification - starting Live Activity NOW")
+            startLiveActivityForDailyReminder()
+        }
+        
         // Check if this is the deadline notification
         if notification.request.identifier == "deadlineCheck" {
             print("⏰ Deadline notification triggered - checking for missed check-in")
             CheckInCoordinator.shared.checkMissedCheckInStatus(fromScheduledNotification: true)
         }
         
-        // Live Activity should already be running proactively
-        // No need to start it here
         completionHandler([.banner, .sound])
     }
     
@@ -215,14 +221,17 @@ extension NotificationManager: UNUserNotificationCenterDelegate {
     ) {
         print("🔔 Notification tapped: \(response.notification.request.identifier)")
         
+        // START LIVE ACTIVITY when user taps daily reminder
+        if response.notification.request.identifier == "dailyReminder" {
+            print("⏰ Daily reminder tapped - starting Live Activity NOW")
+            startLiveActivityForDailyReminder()
+        }
+        
         // Check if this is the deadline notification
         if response.notification.request.identifier == "deadlineCheck" {
             print("⏰ Deadline notification tapped - checking for missed check-in")
             CheckInCoordinator.shared.checkMissedCheckInStatus(fromScheduledNotification: true)
         }
-        
-        // Live Activity should already be running proactively
-        // User can check in directly from Lock Screen Live Activity
         
         if response.actionIdentifier == "CHECK_IN_ACTION" {
             // User tapped "I'm OK" action button from notification
@@ -236,15 +245,35 @@ extension NotificationManager: UNUserNotificationCenterDelegate {
         completionHandler()
     }
     
-    // MARK: - Helper (deprecated - Live Activity now starts proactively)
+    // MARK: - Live Activity Helper
     
-    @available(*, deprecated, message: "Live Activity now starts proactively, not from notifications")
-    private func startLiveActivityForReminder() {
+    private func startLiveActivityForDailyReminder() {
         if #available(iOS 16.1, *) {
-            // Calculate deadline (8 hours from now)
-            let deadline = Calendar.current.date(byAdding: .hour, value: 8, to: Date()) ?? Date()
+            // Don't start if user already checked in
+            guard !DataStore.shared.hasCheckedInToday() else {
+                print("ℹ️ Already checked in today, no Live Activity needed")
+                return
+            }
+            
+            // Calculate deadline (8 hours from reminder time)
+            let reminderTime = DataStore.shared.dailyReminderTime
+            let calendar = Calendar.current
+            let now = Date()
+            
+            // Get today's reminder time
+            let todayReminder = calendar.date(
+                bySettingHour: calendar.component(.hour, from: reminderTime),
+                minute: calendar.component(.minute, from: reminderTime),
+                second: 0,
+                of: now
+            ) ?? now
+            
+            let deadline = calendar.date(byAdding: .hour, value: 8, to: todayReminder) ?? now
+            
             LiveActivityManager.shared.startActivity(deadline: deadline, userName: "You")
-            print("✅ Live Activity started from daily reminder")
+            print("✅ Live Activity started from daily reminder at 9:00 AM")
+            print("   - Deadline: \(deadline)")
+            print("   👉 LOCK YOUR PHONE to see it on Lock Screen")
         }
     }
 }
