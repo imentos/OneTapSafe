@@ -6,15 +6,15 @@
 //
 
 import SwiftUI
+import Firebase
 
 @main
 struct OneTapSafeApp: App {
     
     init() {
-        // Initialize Firebase (analytics, crashlytics)
-        // Note: Requires GoogleService-Info.plist in project
-        // See FIREBASE_SETUP.md for setup instructions
-        FirebaseManager.shared.configure()
+        // Initialize Firebase Analytics
+        FirebaseApp.configure()
+        print("🔥 Firebase configured successfully")
         
         // Setup notifications as fallback
         NotificationManager.shared.setupNotificationCategories()

@@ -2,32 +2,15 @@
 //  FirebaseManager.swift
 //  OneTap OK
 //
-//  Centralized Firebase service manager for analytics, crashlytics, and remote config
+//  Analytics tracking manager for Firebase Analytics
 //
 
 import Foundation
-import Firebase
 import FirebaseAnalytics
-import FirebaseCrashlytics
 
-/// Centralized Firebase manager for analytics and crash reporting
-final class FirebaseManager {
-    
+class FirebaseManager {
     static let shared = FirebaseManager()
-    
     private init() {}
-    
-    // MARK: - Configuration
-    
-    func configure() {
-        #if DEBUG
-        // Enable debug logging in development
-        FirebaseConfiguration.shared.setLoggerLevel(.debug)
-        #endif
-        
-        FirebaseApp.configure()
-        print("🔥 Firebase configured successfully")
-    }
     
     // MARK: - Analytics Events
     
@@ -141,59 +124,6 @@ final class FirebaseManager {
     func updateContactCount(_ count: Int) {
         Analytics.setUserProperty("\(count)", forName: "contact_count")
     }
-    
-    // MARK: - Crashlytics
-    
-    /// Log non-fatal error
-    func logError(_ error: Error, context: String) {
-        let nsError = error as NSError
-        let userInfo = nsError.userInfo.merging(["context": context]) { _, new in new }
-        let enhancedError = NSError(domain: nsError.domain, code: nsError.code, userInfo: userInfo)
-        
-        Crashlytics.crashlytics().record(error: enhancedError)
-        print("⚠️ Crashlytics: Error logged - \(context): \(error.localizedDescription)")
-    }
-    
-    /// Log custom message for debugging crashes
-    func log(_ message: String) {
-        Crashlytics.crashlytics().log(message)
-    }
-    
-    /// Set custom key for crash context
-    func setCustomKey(_ key: String, value: Any) {
-        Crashlytics.crashlytics().setCustomValue(value, forKey: key)
-    }
-    
-    /// Set user identifier (use anonymized ID, not PII)
-    func setUserIdentifier(_ identifier: String) {
-        Crashlytics.crashlytics().setUserID(identifier)
-        Analytics.setUserID(identifier)
-    }
-    
-    // MARK: - Remote Config (Future)
-    
-    // TODO: Add Remote Config methods when needed
-    /*
-    func fetchRemoteConfig(completion: @escaping (Bool) -> Void) {
-        let remoteConfig = RemoteConfig.remoteConfig()
-        remoteConfig.fetch(withExpirationDuration: 3600) { status, error in
-            if status == .success {
-                remoteConfig.activate()
-                completion(true)
-            } else {
-                completion(false)
-            }
-        }
-    }
-    
-    func getGracePeriodHours() -> Int {
-        return RemoteConfig.remoteConfig()["grace_period_hours"].numberValue.intValue
-    }
-    
-    func shouldShowPaywall() -> Bool {
-        return RemoteConfig.remoteConfig()["show_paywall"].boolValue
-    }
-    */
 }
 
 
