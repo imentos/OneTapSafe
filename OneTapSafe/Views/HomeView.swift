@@ -50,6 +50,7 @@ struct HomeView: View {
             }
             .onAppear {
                 checkLiveActivityStatus()
+                FirebaseManager.shared.logHomeViewed()
             }
         }
     }

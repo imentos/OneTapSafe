@@ -11,6 +11,11 @@ import SwiftUI
 struct OneTapSafeApp: App {
     
     init() {
+        // Initialize Firebase (analytics, crashlytics)
+        // Note: Requires GoogleService-Info.plist in project
+        // See FIREBASE_SETUP.md for setup instructions
+        FirebaseManager.shared.configure()
+        
         // Setup notifications as fallback
         NotificationManager.shared.setupNotificationCategories()
         
@@ -21,6 +26,9 @@ struct OneTapSafeApp: App {
         
         // Check for missed check-ins on app launch
         CheckInCoordinator.shared.checkMissedCheckInStatus()
+        
+        // Log app launch event
+        FirebaseManager.shared.logAppLaunch()
     }
     
     var body: some Scene {

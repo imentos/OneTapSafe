@@ -119,6 +119,9 @@ final class DataStore: ObservableObject {
     func addContact(_ contact: TrustedContact) {
         trustedContacts.append(contact)
         saveContacts()
+        
+        // Log analytics event
+        FirebaseManager.shared.logContactAdded(method: contact.method, totalContacts: trustedContacts.count)
     }
     
     func updateContact(_ contact: TrustedContact) {
@@ -131,6 +134,9 @@ final class DataStore: ObservableObject {
     func deleteContact(_ contact: TrustedContact) {
         trustedContacts.removeAll { $0.id == contact.id }
         saveContacts()
+        
+        // Log analytics event
+        FirebaseManager.shared.logContactRemoved(method: contact.method, totalContacts: trustedContacts.count)
     }
     
     // MARK: - Settings
@@ -138,6 +144,10 @@ final class DataStore: ObservableObject {
     func updateReminderTime(_ time: Date) {
         dailyReminderTime = time
         defaults.set(time.timeIntervalSince1970, forKey: Keys.dailyReminderTime)
+        
+        // Log analytics event
+        let components = Calendar.current.dateComponents([.hour, .minute], from: time)
+        FirebaseManager.shared.logReminderTimeChanged(hour: components.hour ?? 9, minute: components.minute ?? 0)
     }
     
     func toggleReminder(_ enabled: Bool) {

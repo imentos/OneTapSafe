@@ -63,6 +63,10 @@ final class CheckInCoordinator: ObservableObject {
         isCheckInDue = false
         missedCheckIn = false
         
+        // Log analytics event
+        let hasContacts = !DataStore.shared.trustedContacts.isEmpty
+        FirebaseManager.shared.logCheckIn(method: method, hasContacts: hasContacts)
+        
         print("✅ Check-in completed via \(method.rawValue)")
     }
     
@@ -95,10 +99,15 @@ final class CheckInCoordinator: ObservableObject {
         
         // Notify emergency contacts
         let missedCheckInTime = DataStore.shared.lastCheckInDate ?? Date()
+        let contactsCount = DataStore.shared.trustedContacts.count
         ContactNotifier.shared.notifyContacts(for: missedCheckInTime)
         
         // Mark that we've notified today
         DataStore.shared.markContactsNotified()
+        
+        // Log analytics event
+        let hoursLate = Int(Date().timeIntervalSince(missedCheckInTime) / 3600)
+        FirebaseManager.shared.logMissedCheckIn(hoursLate: hoursLate, contactsNotified: contactsCount)
         
         print("⚠️ Missed check-in handled - contacts notified")
     }

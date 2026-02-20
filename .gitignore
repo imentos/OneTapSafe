@@ -25,3 +25,14 @@ Carthage/Build/
 
 # macOS
 .DS_Store
+# Firebase
+GoogleService-Info.plist
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+
+# API Keys & Secrets (never commit these)
+*.plist.production
+*.plist.development
+secrets.json

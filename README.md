@@ -103,11 +103,45 @@ OneTapSafe/
 │   ├── CheckInCoordinator.swift
 │   ├── LiveActivityManager.swift
 │   ├── NotificationManager.swift
-│   └── ContactNotifier.swift
+│   ├── ContactNotifier.swift
+│   └── FirebaseManager.swift (Analytics & Crashlytics)
 └── LiveActivity/
     ├── CheckInActivityAttributes.swift
     ├── CheckInLiveActivity.swift
     └── CheckInIntent.swift
+```
+
+## 🔥 Firebase Integration
+
+### Analytics Events Tracked:
+- **app_launch**: App opened
+- **check_in_completed**: User checked in (with method: app/notification/liveActivity)
+- **missed_check_in**: User missed check-in (with hours late, contacts notified)
+- **contact_added**: Emergency contact added
+- **contact_removed**: Emergency contact removed
+- **reminder_time_changed**: User changed reminder time
+- **live_activity_started**: Live Activity launched
+- **screen_view**: Track navigation to different screens
+
+### User Properties:
+- **contact_count**: Number of emergency contacts
+- **notifications_status**: enabled/disabled
+
+### Crashlytics:
+- Automatic crash reporting
+- Non-fatal error logging with context
+- Custom keys for debugging
+
+### Setup:
+See [FIREBASE_SETUP.md](FIREBASE_SETUP.md) for complete setup instructions.
+
+**Quick Start:**
+1. Create Firebase project at https://console.firebase.google.com/
+2. Download `GoogleService-Info.plist`
+3. Add to Xcode project (OneTapSafe target)
+4. Add Firebase SDK via Swift Package Manager
+5. Analytics automatically starts tracking on app launch
+
 ```
 
 ## 📱 User Flow
