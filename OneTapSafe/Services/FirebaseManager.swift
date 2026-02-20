@@ -7,7 +7,6 @@
 
 import Foundation
 
-// Only compile Firebase code if Firebase SDK is available
 #if canImport(Firebase)
 import Firebase
 import FirebaseAnalytics
