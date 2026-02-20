@@ -59,18 +59,18 @@ final class FirebaseManager {
     }
     
     /// Log when emergency contact is added
-    func logContactAdded(method: ContactMethod, totalContacts: Int) {
+    func logContactAdded(method: NotificationMethod, totalContacts: Int) {
         Analytics.logEvent("contact_added", parameters: [
-            "method": method.rawValue,
+            "notification_method": method.rawValue,
             "total_contacts": totalContacts
         ])
         print("📊 Analytics: Contact added (\(method.rawValue))")
     }
     
     /// Log when emergency contact is removed
-    func logContactRemoved(method: ContactMethod, totalContacts: Int) {
+    func logContactRemoved(method: NotificationMethod, totalContacts: Int) {
         Analytics.logEvent("contact_removed", parameters: [
-            "method": method.rawValue,
+            "notification_method": method.rawValue,
             "total_contacts": totalContacts
         ])
     }
@@ -196,17 +196,4 @@ final class FirebaseManager {
     */
 }
 
-// MARK: - Contact Method Extension
 
-extension ContactMethod {
-    var rawValue: String {
-        switch self {
-        case .sms:
-            return "sms"
-        case .email:
-            return "email"
-        case .call:
-            return "call"
-        }
-    }
-}

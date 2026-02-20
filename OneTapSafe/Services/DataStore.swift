@@ -121,7 +121,7 @@ final class DataStore: ObservableObject {
         saveContacts()
         
         // Log analytics event
-        FirebaseManager.shared.logContactAdded(method: contact.method, totalContacts: trustedContacts.count)
+        FirebaseManager.shared.logContactAdded(method: contact.notificationMethod, totalContacts: trustedContacts.count)
     }
     
     func updateContact(_ contact: TrustedContact) {
@@ -136,7 +136,7 @@ final class DataStore: ObservableObject {
         saveContacts()
         
         // Log analytics event
-        FirebaseManager.shared.logContactRemoved(method: contact.method, totalContacts: trustedContacts.count)
+        FirebaseManager.shared.logContactRemoved(method: contact.notificationMethod, totalContacts: trustedContacts.count)
     }
     
     // MARK: - Settings

@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B30560472F48049D001D3E5A /* GoogleService-Info-2.plist in Resources */ = {isa = PBXBuildFile; fileRef = B30560462F48049D001D3E5A /* GoogleService-Info-2.plist */; };
+		B30560482F48049D001D3E5A /* GoogleService-Info-2.plist in Resources */ = {isa = PBXBuildFile; fileRef = B30560462F48049D001D3E5A /* GoogleService-Info-2.plist */; };
+		B305604B2F480552001D3E5A /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = B305604A2F480552001D3E5A /* FirebaseAnalytics */; };
+		B305604D2F480552001D3E5A /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = B305604C2F480552001D3E5A /* FirebaseCrashlytics */; };
 		B32E74B72F1EFADE0093E016 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B32E74B62F1EFADE0093E016 /* WidgetKit.framework */; };
 		B32E74B92F1EFADE0093E016 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B32E74B82F1EFADE0093E016 /* SwiftUI.framework */; };
 		B32E74C82F1EFADF0093E016 /* OneTapSafeWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B32E74B42F1EFADE0093E016 /* OneTapSafeWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -37,6 +41,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		B30560462F48049D001D3E5A /* GoogleService-Info-2.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info-2.plist"; sourceTree = "<group>"; };
 		B30D3B1E2F4033BE00A06F26 /* OneTapSafe.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = OneTapSafe.storekit; sourceTree = "<group>"; };
 		B32E747C2F1ECD6F0093E016 /* OneTapSafe.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OneTapSafe.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B32E74B42F1EFADE0093E016 /* OneTapSafeWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OneTapSafeWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -98,6 +103,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B305604B2F480552001D3E5A /* FirebaseAnalytics in Frameworks */,
+				B305604D2F480552001D3E5A /* FirebaseCrashlytics in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -136,6 +143,7 @@
 		B32E74B52F1EFADE0093E016 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				B30560462F48049D001D3E5A /* GoogleService-Info-2.plist */,
 				B32E74B62F1EFADE0093E016 /* WidgetKit.framework */,
 				B32E74B82F1EFADE0093E016 /* SwiftUI.framework */,
 			);
@@ -164,6 +172,8 @@
 			);
 			name = OneTapSafe;
 			packageProductDependencies = (
+				B305604A2F480552001D3E5A /* FirebaseAnalytics */,
+				B305604C2F480552001D3E5A /* FirebaseCrashlytics */,
 			);
 			productName = OneTapSafe;
 			productReference = B32E747C2F1ECD6F0093E016 /* OneTapSafe.app */;
@@ -218,6 +228,9 @@
 			);
 			mainGroup = B32E74732F1ECD6F0093E016;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				B30560492F480552001D3E5A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = B32E747D2F1ECD6F0093E016 /* Products */;
 			projectDirPath = "";
@@ -234,6 +247,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B30560472F48049D001D3E5A /* GoogleService-Info-2.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -241,6 +255,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B30560482F48049D001D3E5A /* GoogleService-Info-2.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -552,6 +567,30 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		B30560492F480552001D3E5A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.9.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		B305604A2F480552001D3E5A /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B30560492F480552001D3E5A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		B305604C2F480552001D3E5A /* FirebaseCrashlytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B30560492F480552001D3E5A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCrashlytics;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = B32E74742F1ECD6F0093E016 /* Project object */;
 }
