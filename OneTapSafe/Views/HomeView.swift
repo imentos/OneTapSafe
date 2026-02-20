@@ -61,13 +61,8 @@ struct HomeView: View {
     }
     
     private func checkIn() {
-        dataStore.recordCheckIn(method: .app)
+        CheckInCoordinator.shared.handleCheckIn(method: .app)
         showingCheckInSuccess = true
-        
-        // End Live Activity if active
-        if #available(iOS 16.1, *) {
-            LiveActivityManager.shared.endActivity()
-        }
     }
 }
 

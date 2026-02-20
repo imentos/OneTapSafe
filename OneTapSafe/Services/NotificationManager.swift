@@ -90,6 +90,11 @@ final class NotificationManager: NSObject {
         print("✅ Daily reminder and deadline check cancelled")
     }
     
+    func cancelDeadlineNotification() {
+        center.removePendingNotificationRequests(withIdentifiers: ["deadlineCheck"])
+        print("✅ Deadline notification cancelled - user checked in")
+    }
+    
     // MARK: - Missed Check-In Notification Content
     
     private func createMissedCheckInNotificationContent() -> UNMutableNotificationContent {
@@ -207,6 +212,14 @@ extension NotificationManager: UNUserNotificationCenterDelegate {
         // Check if this is the deadline notification
         if notification.request.identifier == "deadlineCheck" {
             print("⏰ Deadline notification triggered - checking for missed check-in")
+            
+            // Double-check: if user already checked in, don't proceed
+            if DataStore.shared.hasCheckedInToday() {
+                print("✅ User already checked in today - suppressing alarm")
+                completionHandler([]) // No banner, no sound
+                return
+            }
+            
             CheckInCoordinator.shared.checkMissedCheckInStatus(fromScheduledNotification: true)
         }
         
@@ -230,16 +243,21 @@ extension NotificationManager: UNUserNotificationCenterDelegate {
         // Check if this is the deadline notification
         if response.notification.request.identifier == "deadlineCheck" {
             print("⏰ Deadline notification tapped - checking for missed check-in")
+            
+            // Double-check: if user already checked in, don't proceed
+            if DataStore.shared.hasCheckedInToday() {
+                print("✅ User already checked in today - no action needed")
+                completionHandler()
+                return
+            }
+            
             CheckInCoordinator.shared.checkMissedCheckInStatus(fromScheduledNotification: true)
         }
         
         if response.actionIdentifier == "CHECK_IN_ACTION" {
             // User tapped "I'm OK" action button from notification
             print("🔔 User tapped 'I'm OK' action button")
-            DataStore.shared.recordCheckIn(method: .notification)
-            if #available(iOS 16.1, *) {
-                LiveActivityManager.shared.endActivity()
-            }
+            CheckInCoordinator.shared.handleCheckIn(method: .notification)
         }
         
         completionHandler()

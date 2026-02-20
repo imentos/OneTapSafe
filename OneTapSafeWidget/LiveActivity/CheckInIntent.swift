@@ -14,20 +14,13 @@ struct CheckInIntent: AppIntent {
     static var openAppWhenRun: Bool = true
     
     func perform() async throws -> some IntentResult {
-        print("🎯 CheckInIntent: Button tapped!")
+        print("🎯 CheckInIntent: Button tapped from Live Activity!")
         
-        // Record check-in and end activity
+        // Use coordinator to properly handle check-in (cancels deadline notification)
         await MainActor.run {
-            print("🎯 Recording check-in...")
-            DataStore.shared.recordCheckIn(method: .liveActivity)
-            print("🎯 Check-in recorded!")
-        }
-        
-        // End Live Activity (with proper async/await)
-        if #available(iOS 16.1, *) {
-            print("🎯 Ending all Live Activities...")
-            await LiveActivityManager.shared.endAllActivities()
-            print("🎯 All activities ended!")
+            print("🎯 Handling check-in through coordinator...")
+            CheckInCoordinator.shared.handleCheckIn(method: .liveActivity)
+            print("🎯 Check-in completed!")
         }
         
         return .result()

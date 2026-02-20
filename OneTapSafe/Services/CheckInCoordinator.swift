@@ -57,6 +57,9 @@ final class CheckInCoordinator: ObservableObject {
             LiveActivityManager.shared.endActivity()
         }
         
+        // Cancel deadline notification - user has checked in, no need for alarm
+        NotificationManager.shared.cancelDeadlineNotification()
+        
         isCheckInDue = false
         missedCheckIn = false
         
