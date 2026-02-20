@@ -16,12 +16,15 @@ struct CheckInIntent: AppIntent {
     func perform() async throws -> some IntentResult {
         print("🎯 CheckInIntent: Button tapped from Live Activity!")
         
-        // Use coordinator to properly handle check-in (cancels deadline notification)
+        // Record check-in directly via DataStore (shared via App Groups)
+        // Widget extensions can't access main app's CheckInCoordinator
         await MainActor.run {
-            print("🎯 Handling check-in through coordinator...")
-            CheckInCoordinator.shared.handleCheckIn(method: .liveActivity)
-            print("🎯 Check-in completed!")
+            DataStore.shared.recordCheckIn(method: .liveActivity)
+            print("🎯 Check-in recorded! App will handle notification cancellation.")
         }
+        
+        // Note: Deadline notification cancellation happens when user opens the app
+        // or when notification checks hasCheckedInToday() before delivery
         
         return .result()
     }
