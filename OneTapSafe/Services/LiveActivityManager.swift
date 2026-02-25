@@ -18,43 +18,45 @@ final class LiveActivityManager {
     // MARK: - Activity Management
     
     func startActivity(deadline: Date, userName: String = "You") {
-        // End any existing activity first
-        endActivity()
-        
-        let authInfo = ActivityAuthorizationInfo()
-        print("📊 Live Activity Authorization Status:")
-        print("   - Enabled: \(authInfo.areActivitiesEnabled)")
-        print("   - Frequent Pushes Enabled: \(authInfo.frequentPushesEnabled)")
-        
-        guard authInfo.areActivitiesEnabled else {
-            print("⚠️ Live Activities not enabled")
-            print("   → User needs to: Settings > OneTap OK > Enable Live Activities")
-            print("   → Fallback: Local notifications will be used instead")
-            return
-        }
-        
-        let attributes = CheckInActivityAttributes(userName: userName)
-        let contentState = CheckInActivityAttributes.ContentState(
-            deadline: deadline,
-            isOverdue: false
-        )
-        
-        do {
-            currentActivity = try Activity<CheckInActivityAttributes>.request(
-                attributes: attributes,
-                contentState: contentState,
-                pushType: nil
+        // End ALL existing activities first (including orphaned ones from previous sessions)
+        Task {
+            await endAllActivities()
+            
+            let authInfo = ActivityAuthorizationInfo()
+            print("📊 Live Activity Authorization Status:")
+            print("   - Enabled: \(authInfo.areActivitiesEnabled)")
+            print("   - Frequent Pushes Enabled: \(authInfo.frequentPushesEnabled)")
+            
+            guard authInfo.areActivitiesEnabled else {
+                print("⚠️ Live Activities not enabled")
+                print("   → User needs to: Settings > OneTap OK > Enable Live Activities")
+                print("   → Fallback: Local notifications will be used instead")
+                return
+            }
+            
+            let attributes = CheckInActivityAttributes(userName: userName)
+            let contentState = CheckInActivityAttributes.ContentState(
+                deadline: deadline,
+                isOverdue: false
             )
-            print("✅ Live Activity started successfully!")
-            print("   - Activity ID: \(currentActivity?.id ?? "unknown")")
-            print("   - Activity State: \(String(describing: currentActivity?.activityState))")
-            print("   - Deadline: \(deadline)")
-            print("👉 LOCK YOUR PHONE to see the Live Activity on your Lock Screen")
-            print("   You can check in by tapping 'I'm OK' button directly from Lock Screen")
-        } catch {
-            print("❌ Failed to start Live Activity: \(error)")
-            print("   - Error details: \(error.localizedDescription)")
-            print("   → Fallback: Local notifications will be used instead")
+            
+            do {
+                currentActivity = try Activity<CheckInActivityAttributes>.request(
+                    attributes: attributes,
+                    contentState: contentState,
+                    pushType: nil
+                )
+                print("✅ Live Activity started successfully!")
+                print("   - Activity ID: \(currentActivity?.id ?? "unknown")")
+                print("   - Activity State: \(String(describing: currentActivity?.activityState))")
+                print("   - Deadline: \(deadline)")
+                print("👉 LOCK YOUR PHONE to see the Live Activity on your Lock Screen")
+                print("   You can check in by tapping 'I'm OK' button directly from Lock Screen")
+            } catch {
+                print("❌ Failed to start Live Activity: \(error)")
+                print("   - Error details: \(error.localizedDescription)")
+                print("   → Fallback: Local notifications will be used instead")
+            }
         }
     }
     
@@ -76,24 +78,31 @@ final class LiveActivityManager {
     }
     
     func endActivity() {
-        guard let activity = currentActivity else { return }
-        
         Task {
-            await activity.end(dismissalPolicy: .immediate)
-            currentActivity = nil
-            print("✅ Live Activity ended")
+            // End ALL activities, not just currentActivity
+            // This ensures we clean up orphaned activities from previous sessions
+            await endAllActivities()
         }
     }
     
     func hasActiveActivity() -> Bool {
-        guard let activity = currentActivity else {
-            return false
+        // Check if ANY activity exists, not just currentActivity
+        // This catches orphaned activities from previous sessions
+        let allActivities = Activity<CheckInActivityAttributes>.activities
+        let hasActivity = !allActivities.isEmpty
+        
+        if hasActivity {
+            print("ℹ️ Found \(allActivities.count) active Live Activity/Activities")
+            // Update currentActivity reference if we don't have one
+            if currentActivity == nil && !allActivities.isEmpty {
+                currentActivity = allActivities.first
+                print("ℹ️ Restored reference to existing Live Activity")
+            }
+        } else {
+            print("ℹ️ No active Live Activities found")
         }
         
-        // Check if activity is still active (not ended)
-        let isActive = activity.activityState == .active
-        print("ℹ️ Checking Live Activity status: \(isActive ? "Active" : "Not Active")")
-        return isActive
+        return hasActivity
     }
     
     func endAllActivities() async {

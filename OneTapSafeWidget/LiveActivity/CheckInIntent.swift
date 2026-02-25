@@ -17,14 +17,20 @@ struct CheckInIntent: AppIntent {
         print("🎯 CheckInIntent: Button tapped from Live Activity!")
         
         // Record check-in directly via DataStore (shared via App Groups)
-        // Widget extensions can't access main app's CheckInCoordinator
         await MainActor.run {
             DataStore.shared.recordCheckIn(method: .liveActivity)
-            print("🎯 Check-in recorded! App will handle notification cancellation.")
+            print("✅ Check-in recorded via Live Activity!")
+            
+            // End the Live Activity immediately
+            if #available(iOS 16.1, *) {
+                LiveActivityManager.shared.endActivity()
+                print("✅ Live Activity ended")
+            }
         }
         
-        // Note: Deadline notification cancellation happens when user opens the app
-        // or when notification checks hasCheckedInToday() before delivery
+        // App will open and handle:
+        // 1. Cancel deadline notification (OneTapSafeApp.startLiveActivityIfNeeded)
+        // 2. Verify Live Activity cleanup
         
         return .result()
     }

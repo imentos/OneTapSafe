@@ -16,6 +16,18 @@ struct OneTapSafeApp: App {
         FirebaseApp.configure()
         print("🔥 Firebase configured successfully")
         
+        // Clean up orphaned Live Activities from previous sessions
+        // This must happen BEFORE checking missed check-ins
+        if #available(iOS 16.1, *) {
+            Task {
+                // Only clean up if user has already checked in today
+                if DataStore.shared.hasCheckedInToday() {
+                    await LiveActivityManager.shared.endAllActivities()
+                    print("🧹 Cleaned up orphaned Live Activities (user already checked in)")
+                }
+            }
+        }
+        
         // Setup notifications as fallback
         NotificationManager.shared.setupNotificationCategories()
         
@@ -79,15 +91,21 @@ struct OneTapSafeApp: App {
             return
         }
         
-        // Don't start if there's already an active Live Activity
-        if LiveActivityManager.shared.hasActiveActivity() {
-            print("ℹ️ Live Activity already active, skipping")
+        // If user has checked in today, end any active Live Activity and cancel notifications
+        if DataStore.shared.hasCheckedInToday() {
+            if LiveActivityManager.shared.hasActiveActivity() {
+                print("✅ Check-in completed - ending Live Activity and cancelling notifications")
+                LiveActivityManager.shared.endActivity()
+                NotificationManager.shared.cancelDeadlineNotification()
+            } else {
+                print("ℹ️ Already checked in today, no Live Activity needed")
+            }
             return
         }
         
-        // Only start if user hasn't checked in today
-        guard !DataStore.shared.hasCheckedInToday() else {
-            print("ℹ️ Already checked in today, no Live Activity needed")
+        // Don't start if there's already an active Live Activity
+        if LiveActivityManager.shared.hasActiveActivity() {
+            print("ℹ️ Live Activity already active, skipping")
             return
         }
         

@@ -63,12 +63,31 @@ final class NotificationManager: NSObject {
         
         // 2. Schedule deadline check notification (8 hours after reminder)
         // This ensures contacts get notified even if user doesn't open the app
-        var deadlineComponents = components
-        if let hour = components.hour {
-            deadlineComponents.hour = (hour + 8) % 24  // Add 8 hours, wrap around if needed
+        // IMPORTANT: Schedule for TODAY ONLY - not repeating
+        // Next day's deadline will be scheduled when next check-in flow starts
+        let calendar = Calendar.current
+        let now = Date()
+        
+        // Calculate today's deadline time (reminder time + 8 hours)
+        guard let todayDeadline = calendar.date(
+            bySettingHour: components.hour ?? 9,
+            minute: components.minute ?? 0,
+            second: 0,
+            of: now
+        ),
+        let deadlineWithOffset = calendar.date(byAdding: .hour, value: 8, to: todayDeadline) else {
+            print("❌ Failed to calculate deadline time")
+            return
         }
         
-        let deadlineTrigger = UNCalendarNotificationTrigger(dateMatching: deadlineComponents, repeats: true)
+        // Only schedule if deadline is in the future
+        guard deadlineWithOffset > now else {
+            print("ℹ️ Deadline time already passed today - will schedule tomorrow")
+            return
+        }
+        
+        let deadlineComponents = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: deadlineWithOffset)
+        let deadlineTrigger = UNCalendarNotificationTrigger(dateMatching: deadlineComponents, repeats: false)
         
         let deadlineRequest = UNNotificationRequest(
             identifier: "deadlineCheck",
@@ -93,6 +112,56 @@ final class NotificationManager: NSObject {
     func cancelDeadlineNotification() {
         center.removePendingNotificationRequests(withIdentifiers: ["deadlineCheck"])
         print("✅ Deadline notification cancelled - user checked in")
+    }
+    
+    // MARK: - Schedule Today's Deadline Only
+    
+    /// Schedules deadline notification for TODAY only (not repeating)
+    /// Called when daily reminder fires to set today's deadline
+    func scheduleTodayDeadlineNotification(reminderTime: Date) {
+        // Cancel any existing deadline notification first
+        center.removePendingNotificationRequests(withIdentifiers: ["deadlineCheck"])
+        
+        let calendar = Calendar.current
+        let now = Date()
+        
+        // Calculate today's deadline time (reminder time + 8 hours)
+        let components = calendar.dateComponents([.hour, .minute], from: reminderTime)
+        guard let todayDeadline = calendar.date(
+            bySettingHour: components.hour ?? 9,
+            minute: components.minute ?? 0,
+            second: 0,
+            of: now
+        ),
+        let deadlineWithOffset = calendar.date(byAdding: .hour, value: 8, to: todayDeadline) else {
+            print("❌ Failed to calculate deadline time")
+            return
+        }
+        
+        // Only schedule if deadline is in the future
+        guard deadlineWithOffset > now else {
+            print("ℹ️ Deadline time already passed today - no notification needed")
+            return
+        }
+        
+        let deadlineComponents = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: deadlineWithOffset)
+        let deadlineTrigger = UNCalendarNotificationTrigger(dateMatching: deadlineComponents, repeats: false)
+        
+        let deadlineRequest = UNNotificationRequest(
+            identifier: "deadlineCheck",
+            content: createMissedCheckInNotificationContent(),
+            trigger: deadlineTrigger
+        )
+        
+        center.add(deadlineRequest) { error in
+            if let error = error {
+                print("❌ Failed to schedule today's deadline: \(error)")
+            } else {
+                let formatter = DateFormatter()
+                formatter.timeStyle = .short
+                print("✅ Today's deadline scheduled for \(formatter.string(from: deadlineWithOffset))")
+            }
+        }
     }
     
     // MARK: - Missed Check-In Notification Content
@@ -207,6 +276,11 @@ extension NotificationManager: UNUserNotificationCenterDelegate {
         if notification.request.identifier == "dailyReminder" {
             print("⏰ Daily reminder notification - starting Live Activity NOW")
             startLiveActivityForDailyReminder()
+            
+            // CRITICAL FIX: Reschedule today's deadline notification
+            // Since we changed deadline to non-repeating, we must reschedule it daily
+            let reminderTime = DataStore.shared.dailyReminderTime
+            scheduleTodayDeadlineNotification(reminderTime: reminderTime)
         }
         
         // Check if this is the deadline notification
@@ -238,6 +312,11 @@ extension NotificationManager: UNUserNotificationCenterDelegate {
         if response.notification.request.identifier == "dailyReminder" {
             print("⏰ Daily reminder tapped - starting Live Activity NOW")
             startLiveActivityForDailyReminder()
+            
+            // CRITICAL FIX: Reschedule today's deadline notification
+            // Since we changed deadline to non-repeating, we must reschedule it daily
+            let reminderTime = DataStore.shared.dailyReminderTime
+            scheduleTodayDeadlineNotification(reminderTime: reminderTime)
         }
         
         // Check if this is the deadline notification

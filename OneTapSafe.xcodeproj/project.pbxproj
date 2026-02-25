@@ -7,11 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		B305604B2F480552001D3E5A /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = B305604A2F480552001D3E5A /* FirebaseAnalytics */; };
 		B305604F2F480733001D3E5A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B305604E2F480733001D3E5A /* GoogleService-Info.plist */; };
 		B32E74B72F1EFADE0093E016 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B32E74B62F1EFADE0093E016 /* WidgetKit.framework */; };
 		B32E74B92F1EFADE0093E016 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B32E74B82F1EFADE0093E016 /* SwiftUI.framework */; };
 		B32E74C82F1EFADF0093E016 /* OneTapSafeWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = B32E74B42F1EFADE0093E016 /* OneTapSafeWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		B3E617AF2F481144009FF88C /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = B3E617AE2F481144009FF88C /* FirebaseAnalytics */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -101,7 +101,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B305604B2F480552001D3E5A /* FirebaseAnalytics in Frameworks */,
+				B3E617AF2F481144009FF88C /* FirebaseAnalytics in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -169,8 +169,7 @@
 			);
 			name = OneTapSafe;
 			packageProductDependencies = (
-				B305604A2F480552001D3E5A /* FirebaseAnalytics */,
-				B305604C2F480552001D3E5A /* FirebaseCrashlytics */,
+				B3E617AE2F481144009FF88C /* FirebaseAnalytics */,
 			);
 			productName = OneTapSafe;
 			productReference = B32E747C2F1ECD6F0093E016 /* OneTapSafe.app */;
@@ -226,7 +225,7 @@
 			mainGroup = B32E74732F1ECD6F0093E016;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				B30560492F480552001D3E5A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				B3E617AD2F481144009FF88C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = B32E747D2F1ECD6F0093E016 /* Products */;
@@ -565,7 +564,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		B30560492F480552001D3E5A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+		B3E617AD2F481144009FF88C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
 			requirement = {
@@ -576,9 +575,9 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		B305604A2F480552001D3E5A /* FirebaseAnalytics */ = {
+		B3E617AE2F481144009FF88C /* FirebaseAnalytics */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B30560492F480552001D3E5A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			package = B3E617AD2F481144009FF88C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseAnalytics;
 		};
 /* End XCSwiftPackageProductDependency section */
