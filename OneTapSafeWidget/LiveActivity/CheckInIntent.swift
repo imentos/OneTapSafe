@@ -16,21 +16,14 @@ struct CheckInIntent: AppIntent {
     func perform() async throws -> some IntentResult {
         print("🎯 CheckInIntent: Button tapped from Live Activity!")
         
-        // Record check-in directly via DataStore (shared via App Groups)
+        // Use CheckInCoordinator to properly handle check-in
+        // This ensures deadline notification gets cancelled
         await MainActor.run {
-            DataStore.shared.recordCheckIn(method: .liveActivity)
-            print("✅ Check-in recorded via Live Activity!")
-            
-            // End the Live Activity immediately
-            if #available(iOS 16.1, *) {
-                LiveActivityManager.shared.endActivity()
-                print("✅ Live Activity ended")
-            }
+            CheckInCoordinator.shared.handleCheckIn(method: .liveActivity)
+            print("✅ Check-in completed via coordinator!")
         }
         
-        // App will open and handle:
-        // 1. Cancel deadline notification (OneTapSafeApp.startLiveActivityIfNeeded)
-        // 2. Verify Live Activity cleanup
+        // App will open and verify cleanup
         
         return .result()
     }

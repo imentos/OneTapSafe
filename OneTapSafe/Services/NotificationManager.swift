@@ -277,10 +277,15 @@ extension NotificationManager: UNUserNotificationCenterDelegate {
             print("⏰ Daily reminder notification - starting Live Activity NOW")
             startLiveActivityForDailyReminder()
             
-            // CRITICAL FIX: Reschedule today's deadline notification
-            // Since we changed deadline to non-repeating, we must reschedule it daily
-            let reminderTime = DataStore.shared.dailyReminderTime
-            scheduleTodayDeadlineNotification(reminderTime: reminderTime)
+            // CRITICAL FIX: Only reschedule deadline if user hasn't checked in yet
+            // This prevents rescheduling after user has already checked in
+            if !DataStore.shared.hasCheckedInToday() {
+                print("⏰ Rescheduling today's deadline since user hasn't checked in")
+                let reminderTime = DataStore.shared.dailyReminderTime
+                scheduleTodayDeadlineNotification(reminderTime: reminderTime)
+            } else {
+                print("✅ User already checked in today - skipping deadline reschedule")
+            }
         }
         
         // Check if this is the deadline notification
@@ -313,10 +318,15 @@ extension NotificationManager: UNUserNotificationCenterDelegate {
             print("⏰ Daily reminder tapped - starting Live Activity NOW")
             startLiveActivityForDailyReminder()
             
-            // CRITICAL FIX: Reschedule today's deadline notification
-            // Since we changed deadline to non-repeating, we must reschedule it daily
-            let reminderTime = DataStore.shared.dailyReminderTime
-            scheduleTodayDeadlineNotification(reminderTime: reminderTime)
+            // CRITICAL FIX: Only reschedule deadline if user hasn't checked in yet
+            // This prevents rescheduling after user has already checked in
+            if !DataStore.shared.hasCheckedInToday() {
+                print("⏰ Rescheduling today's deadline since user hasn't checked in")
+                let reminderTime = DataStore.shared.dailyReminderTime
+                scheduleTodayDeadlineNotification(reminderTime: reminderTime)
+            } else {
+                print("✅ User already checked in today - skipping deadline reschedule")
+            }
         }
         
         // Check if this is the deadline notification
