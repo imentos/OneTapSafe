@@ -10,6 +10,7 @@ import Firebase
 
 @main
 struct OneTapSafeApp: App {
+    @Environment(\.scenePhase) private var scenePhase
     
     init() {
         // Initialize Firebase Analytics
@@ -65,6 +66,18 @@ struct OneTapSafeApp: App {
                     // 3. Auto-restart Live Activity if app opens and check-in is due
                     startLiveActivityIfNeeded()
                 }
+        }
+        .onChange(of: scenePhase) { oldPhase, newPhase in
+            // CRITICAL: Cancel deadline notification when app becomes active
+            // This handles the case where CheckInIntent (Live Activity button) 
+            // opens the app after recording check-in
+            if newPhase == .active {
+                print("📱 App became active - checking for check-in status")
+                if DataStore.shared.hasCheckedInToday() {
+                    print("✅ User checked in - cancelling deadline notification")
+                    NotificationManager.shared.cancelDeadlineNotification()
+                }
+            }
         }
     }
     
