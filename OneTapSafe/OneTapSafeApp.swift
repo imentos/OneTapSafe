@@ -91,14 +91,18 @@ struct OneTapSafeApp: App {
             return
         }
         
-        // If user has checked in today, end any active Live Activity and cancel notifications
+        // If user has checked in today, cleanup everything
         if DataStore.shared.hasCheckedInToday() {
+            // ALWAYS cancel deadline notification when checked in
+            // (Live Activity may have already been ended by CheckInIntent)
+            NotificationManager.shared.cancelDeadlineNotification()
+            
+            // End Live Activity if still active
             if LiveActivityManager.shared.hasActiveActivity() {
                 print("✅ Check-in completed - ending Live Activity and cancelling notifications")
                 LiveActivityManager.shared.endActivity()
-                NotificationManager.shared.cancelDeadlineNotification()
             } else {
-                print("ℹ️ Already checked in today, no Live Activity needed")
+                print("✅ Already checked in today - deadline notification cancelled")
             }
             return
         }
