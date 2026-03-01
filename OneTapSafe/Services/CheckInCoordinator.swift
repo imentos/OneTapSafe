@@ -124,8 +124,13 @@ final class CheckInCoordinator: ObservableObject {
         // Check if user should have checked in today but hasn't
         let hasCheckedIn = DataStore.shared.hasCheckedInToday()
         
-        // For testing: skip deadline check and force notification
+        // For testing: force notification ONLY if user hasn't checked in yet
         if forceTest {
+            if hasCheckedIn {
+                print("🧪 Test mode: User already checked in - skipping notification")
+                print("✅ TEST PASSED: Emergency contacts will NOT be notified")
+                return
+            }
             print("🧪 Test mode: Forcing missed check-in notification")
             handleMissedCheckIn()
             return

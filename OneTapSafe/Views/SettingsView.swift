@@ -120,10 +120,22 @@ struct SettingsView: View {
                             Label("Test Notification (5 sec)", systemImage: "bell.fill")
                         }
                         
+                        Button {
+                            testDeadlineFlow()
+                        } label: {
+                            Label("Test Deadline Flow (10 sec)", systemImage: "timer")
+                        }
+                        
                         Button(role: .destructive) {
                             testMissedCheckIn()
                         } label: {
                             Label("Test Missed Check-In", systemImage: "exclamationmark.triangle.fill")
+                        }
+                        
+                        Button {
+                            clearTodayCheckIn()
+                        } label: {
+                            Label("Clear Today's Check-In", systemImage: "arrow.counterclockwise")
                         }
                     }
                 }
@@ -208,6 +220,35 @@ struct SettingsView: View {
         CheckInCoordinator.shared.checkMissedCheckInStatus(forceTest: true)
         
         print("🧪 Check your email for notifications from emergency contacts")
+    }
+    
+    private func testDeadlineFlow() {
+        print("🧪 Testing deadline notification flow...")
+        
+        // Clear today's check-in
+        DataStore.shared.lastCheckInDate = nil
+        UserDefaults.standard.removeObject(forKey: "lastCheckInDate")
+        
+        // Schedule deadline notification for 10 seconds from now
+        let deadline = Calendar.current.date(byAdding: .second, value: 10, to: Date())!
+        NotificationManager.shared.scheduleDeadlineNotification(for: deadline)
+        
+        print("🧪 Deadline notification scheduled for 10 seconds from now")
+        print("🧪 Check in before then to verify notification gets cancelled")
+    }
+    
+    private func clearTodayCheckIn() {
+        print("🧪 Clearing today's check-in...")
+        
+        DataStore.shared.lastCheckInDate = nil
+        UserDefaults.standard.removeObject(forKey: "lastCheckInDate")
+        
+        // Also end any active Live Activity
+        if #available(iOS 16.1, *) {
+            LiveActivityManager.shared.endActivity()
+        }
+        
+        print("✅ Today's check-in cleared. You can now check in again.")
     }
 }
 
