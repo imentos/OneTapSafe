@@ -110,6 +110,29 @@ final class NotificationManager: NSObject {
     }
     
     func cancelDeadlineNotification() {
+        print("🔔 Attempting to cancel deadline notification...")
+        
+        // First, let's see what pending notifications exist
+        center.getPendingNotificationRequests { requests in
+            let deadlineNotifications = requests.filter { $0.identifier == "deadlineCheck" }
+            print("🔔 Found \(deadlineNotifications.count) pending deadline notification(s)")
+            if deadlineNotifications.isEmpty {
+                print("⚠️ No pending deadline notifications found to cancel")
+            } else {
+                print("🔔 Pending deadline notifications: \(deadlineNotifications.map { $0.identifier })")
+            }
+        }
+        
+        // Also check delivered notifications
+        center.getDeliveredNotifications { notifications in
+            let delivered = notifications.filter { $0.request.identifier == "deadlineCheck" }
+            if !delivered.isEmpty {
+                print("⚠️ Found \(delivered.count) already delivered deadline notification(s)")
+                print("🧹 Removing delivered notifications from notification center...")
+                self.center.removeDeliveredNotifications(withIdentifiers: ["deadlineCheck"])
+            }
+        }
+        
         center.removePendingNotificationRequests(withIdentifiers: ["deadlineCheck"])
         print("✅ Deadline notification cancelled - user checked in")
     }
@@ -223,6 +246,13 @@ final class NotificationManager: NSObject {
                 let formatter = DateFormatter()
                 formatter.timeStyle = .medium
                 print("✅ Test deadline scheduled for \(formatter.string(from: deadline))")
+                print("🔔 Notification ID: deadlineCheck")
+                
+                // Verify it was actually added
+                self.center.getPendingNotificationRequests { requests in
+                    let count = requests.filter { $0.identifier == "deadlineCheck" }.count
+                    print("🔔 Verified: \(count) deadline notification(s) pending")
+                }
             }
         }
     }

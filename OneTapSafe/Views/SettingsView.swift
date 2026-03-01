@@ -223,18 +223,24 @@ struct SettingsView: View {
     }
     
     private func testDeadlineFlow() {
-        print("🧪 Testing deadline notification flow...")
+        print("\n🧪 ========== TEST DEADLINE FLOW START ==========")
+        print("🧪 Current time: \(Date())")
         
         // Clear today's check-in
         DataStore.shared.lastCheckInDate = nil
         UserDefaults.standard.removeObject(forKey: "lastCheckInDate")
+        print("🧪 Cleared today's check-in")
         
         // Schedule deadline notification for 10 seconds from now
         let deadline = Calendar.current.date(byAdding: .second, value: 10, to: Date())!
+        print("🧪 Scheduling deadline for: \(deadline)")
         NotificationManager.shared.scheduleTestDeadlineNotification(for: deadline)
         
-        print("🧪 Deadline notification scheduled for 10 seconds from now")
-        print("🧪 Check in before then to verify notification gets cancelled")
+        print("🧪 ========================================")
+        print("🧪 NEXT STEP: Go to Home tab and tap 'Check In'")
+        print("🧪 Watch the console for cancellation logs")
+        print("🧪 If notification still appears after 10 seconds, there's a bug")
+        print("🧪 ========================================\n")
     }
     
     private func clearTodayCheckIn() {

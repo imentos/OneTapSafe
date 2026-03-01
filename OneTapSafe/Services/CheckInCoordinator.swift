@@ -50,6 +50,7 @@ final class CheckInCoordinator: ObservableObject {
     // MARK: - Handle Check-In Completion
     
     func handleCheckIn(method: CheckInMethod) {
+        print("\n🎯 handleCheckIn() called - method: \(method.rawValue)")
         DataStore.shared.recordCheckIn(method: method)
         
         // End Live Activity
@@ -58,7 +59,9 @@ final class CheckInCoordinator: ObservableObject {
         }
         
         // Cancel deadline notification - user has checked in, no need for alarm
+        print("🔔 About to cancel deadline notification...")
         NotificationManager.shared.cancelDeadlineNotification()
+        print("🔔 Deadline notification cancellation completed")
         
         isCheckInDue = false
         missedCheckIn = false
