@@ -202,6 +202,31 @@ final class NotificationManager: NSObject {
         }
     }
     
+    func scheduleTestDeadlineNotification(for deadline: Date) {
+        // Cancel any existing deadline notification first
+        center.removePendingNotificationRequests(withIdentifiers: ["deadlineCheck"])
+        
+        let calendar = Calendar.current
+        let deadlineComponents = calendar.dateComponents([.year, .month, .day, .hour, .minute, .second], from: deadline)
+        let deadlineTrigger = UNCalendarNotificationTrigger(dateMatching: deadlineComponents, repeats: false)
+        
+        let deadlineRequest = UNNotificationRequest(
+            identifier: "deadlineCheck",
+            content: createMissedCheckInNotificationContent(),
+            trigger: deadlineTrigger
+        )
+        
+        center.add(deadlineRequest) { error in
+            if let error = error {
+                print("❌ Failed to schedule test deadline: \(error)")
+            } else {
+                let formatter = DateFormatter()
+                formatter.timeStyle = .medium
+                print("✅ Test deadline scheduled for \(formatter.string(from: deadline))")
+            }
+        }
+    }
+    
     // MARK: - Missed Check-In Alert (for manual triggers)
     
     func sendMissedCheckInNotification() {

@@ -231,7 +231,7 @@ struct SettingsView: View {
         
         // Schedule deadline notification for 10 seconds from now
         let deadline = Calendar.current.date(byAdding: .second, value: 10, to: Date())!
-        NotificationManager.shared.scheduleDeadlineNotification(for: deadline)
+        NotificationManager.shared.scheduleTestDeadlineNotification(for: deadline)
         
         print("🧪 Deadline notification scheduled for 10 seconds from now")
         print("🧪 Check in before then to verify notification gets cancelled")
