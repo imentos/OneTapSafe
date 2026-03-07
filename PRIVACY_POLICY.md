@@ -1,31 +1,31 @@
-# Privacy Policy for One Tap OK
+# Privacy Policy for OneTapSafe
 
 **Last Updated: January 22, 2026**
 
 ---
 
-## Introduction
+## Protect Your Privacy by Design
 
-One Tap OK ("we," "our," or "the app") is committed to protecting your privacy. This Privacy Policy explains how we handle information when you use our iOS application.
+OneTapSafe ("we," "our," or "the app") puts your privacy first. This Privacy Policy explains how we handle information when you use our iOS application.
 
-**Our Core Principle: Your data stays on your device.**
+**Keep Your Data On Your Device - Our Core Promise**
 
 ---
 
-## Information We Collect
+## Store Your Information Locally and Securely
 
-### Information Stored Locally on Your Device
+### Keep Your Data on Your Device Only
 
-One Tap OK stores the following information locally on your iPhone using iOS UserDefaults:
+OneTapSafe stores the following information locally on your iPhone using iOS UserDefaults:
 
 - **Check-in history**: Timestamps and methods of your daily check-ins
 - **Trusted contact information**: Name, phone number, and email address of your emergency contact
 - **App settings**: Your preferred reminder time and notification preferences
 - **Check-in streak data**: Statistics about your check-in consistency
 
-### Information We Do NOT Collect
+### Enjoy Zero Data Collection
 
-We do not collect, transmit, or store any personal information on external servers. Specifically, we do NOT collect:
+Protect your privacy - we never collect, transmit, or store any personal information on external servers. We do NOT collect:
 
 - Location data or GPS information
 - Personal identifiers
@@ -36,9 +36,9 @@ We do not collect, transmit, or store any personal information on external serve
 
 ---
 
-## How We Use Your Information
+## Use Your Data for Your Benefit Only
 
-Since all data is stored locally on your device:
+Control how your locally-stored data serves you:
 
 - **Check-in tracking**: To maintain your daily check-in history and streak
 - **Reminders**: To send you daily notifications at your preferred time
@@ -47,19 +47,19 @@ Since all data is stored locally on your device:
 
 ---
 
-## Data Sharing and Disclosure
+## Share Data Only When You Need Help
 
-### Contact Notifications
+### Send Notifications Through Your Device
 
-When you miss a check-in, One Tap OK uses your device's native SMS (Messages) or Email apps to send a notification to your trusted contact. This is the ONLY instance where your data leaves your device, and it is:
+Notify your trusted contact using your device's native SMS (Messages) or Email apps when you miss a check-in. This is the ONLY instance where your data leaves your device, and it is:
 
 - **User-initiated**: Only happens when you miss a check-in
 - **Device-native**: Uses your iPhone's built-in messaging apps
 - **Not stored by us**: We do not access, store, or transmit the content of these messages
 
-### Third-Party Services
+### Trust Our Zero Third-Party Policy
 
-One Tap OK does NOT use:
+Rest assured - OneTapSafe does NOT use:
 
 - Analytics services (no Google Analytics, Firebase Analytics, etc.)
 - Advertising networks
@@ -68,29 +68,29 @@ One Tap OK does NOT use:
 - Cloud storage services
 - External databases or servers
 
-### Apple iCloud Backup
+### Control Your iCloud Backup Settings
 
-If you have iCloud Backup enabled on your iPhone, your app data may be included in your automatic device backups. This is controlled by your iOS settings, not by our app. To manage this:
+Manage your backups - if you have iCloud Backup enabled on your iPhone, your app data may be included in your automatic device backups. Control this through your iOS settings, not our app. To manage this:
 
 1. Go to Settings > [Your Name] > iCloud > Manage Storage > Backups
 2. Select your device
-3. Choose whether to include One Tap OK in backups
+3. Choose whether to include OneTapSafe in backups
 
 ---
 
-## Data Security
+## Secure Your Data with iOS Protection
 
-### Local Storage
+### Benefit from Built-In iOS Security
 
-All your data is stored securely on your device using iOS UserDefaults, which is:
+Keep your data protected - everything is stored securely on your device using iOS UserDefaults, which is:
 
 - Protected by your device's passcode/Face ID/Touch ID
 - Encrypted when your device is locked (iOS Data Protection)
 - Isolated from other apps by iOS app sandboxing
 
-### No Server-Side Storage
+### Eliminate Server-Side Risks Completely
 
-Since we do not operate any servers or cloud services, there is no risk of:
+Sleep soundly - since we do not operate any servers or cloud services, you face zero risk of:
 
 - Data breaches on our servers (we have none)
 - Unauthorized access to a central database (we have none)
@@ -98,63 +98,63 @@ Since we do not operate any servers or cloud services, there is no risk of:
 
 ---
 
-## Your Rights and Choices
+## Exercise Your Rights and Control
 
-### Data Access
+### Access Your Data Anytime
 
-You can view all your data within the app:
+View all your data easily within the app:
 
 - Check-in history in the History tab
 - Trusted contact in the Contacts tab
 - Settings in the Settings tab
 
-### Data Deletion
+### Delete Your Data Instantly
 
-You can delete your data at any time:
+Remove your data whenever you want:
 
 - **Delete all data**: Go to Settings > Reset All Data
 - **Remove contact**: Go to Contacts tab and delete your trusted contact
 - **Uninstall app**: Deleting the app from your device permanently removes all local data
 
-### Export Data
+### View Your Data Within the App
 
-Currently, One Tap OK does not include a data export feature. All data remains on your device and can be viewed within the app.
-
----
-
-## Children's Privacy
-
-One Tap OK is not directed to children under the age of 13. We do not knowingly collect personal information from children under 13. If you are under 13, please do not use this app or provide any information.
+Access your information directly - OneTapSafe keeps all data on your device and displays it within the app. Data export features may be added in future updates.
 
 ---
 
-## Permissions
+## Protect Children's Privacy
 
-One Tap OK requests the following iOS permissions:
+Keep children safe - OneTapSafe is not directed to children under the age of 13. We do not knowingly collect personal information from children under 13. If you are under 13, please do not use this app or provide any information.
+
+---
+
+## Grant Only Essential Permissions
+
+Use OneTapSafe with minimal permissions - we request only what's necessary:
 
 ### Notifications (Required)
 
 - **Purpose**: To send daily reminders and missed check-in alerts
-- **How to manage**: Go to iOS Settings > Notifications > One Tap OK
+- **How to manage**: Go to iOS Settings > Notifications > OneTapSafe
 
 ### Live Activities (Required)
 
 - **Purpose**: To display the "I'm OK" button on your lock screen
 - **How to manage**: This is automatically managed by iOS
 
-### Contacts (Optional - Not Currently Used)
+### Respect Your Contacts Privacy
 
-- We do NOT access your Contacts. You manually enter your trusted contact's information.
+- Protect your contacts - we do NOT access your Contacts app. You manually enter your trusted contact's information.
 
-### Location (Not Used)
+### Skip Location Tracking Entirely
 
-- We do NOT request or access your location at any time.
+- Move freely - we do NOT request or access your location at any time.
 
 ---
 
-## Changes to This Privacy Policy
+## Stay Informed About Policy Changes
 
-We may update this Privacy Policy from time to time. We will notify you of any changes by:
+Receive updates about privacy changes - we may update this Privacy Policy from time to time. We will notify you by:
 
 - Updating the "Last Updated" date at the top of this policy
 - Posting the new Privacy Policy in the app and on our website
@@ -164,9 +164,9 @@ Your continued use of the app after changes are posted constitutes your acceptan
 
 ---
 
-## International Users
+## Use OneTapSafe Anywhere in the World
 
-One Tap OK is designed for users worldwide. Since all data is stored locally on your device:
+Enjoy global privacy protection - OneTapSafe is designed for users worldwide. Since all data is stored locally on your device:
 
 - We do not transfer data across international borders
 - Your data remains subject to the privacy laws of your jurisdiction
@@ -174,28 +174,28 @@ One Tap OK is designed for users worldwide. Since all data is stored locally on 
 
 ---
 
-## Legal Compliance
+## Comply with Global Privacy Laws
 
-### Data Protection Laws
+### Meet International Data Protection Standards
 
-Our privacy-first design complies with major data protection regulations:
+Benefit from privacy-first design that complies with major data protection regulations:
 
 - **GDPR (EU)**: We do not process personal data on servers, eliminating most GDPR obligations
 - **CCPA (California)**: We do not sell or share personal information
 - **Other jurisdictions**: Our local-only storage approach meets or exceeds most privacy requirements
 
-### Law Enforcement Requests
+### Understand Our Law Enforcement Policy
 
-Since we do not collect or store user data on our servers:
+Protect your privacy - since we do not collect or store user data on our servers:
 
 - We cannot provide user data in response to law enforcement requests
 - Any data requests must be directed to the user's device via legal channels (e.g., device warrant)
 
 ---
 
-## Contact Us
+## Get Help with Privacy Questions
 
-If you have questions or concerns about this Privacy Policy or our data practices, please contact us:
+Reach out anytime - if you have questions or concerns about this Privacy Policy or our data practices, please contact us:
 
 **Email**: [your-contact-email@example.com]  
 **GitHub**: https://github.com/imentos/OneTapSafe (for technical questions)
@@ -204,19 +204,19 @@ We will respond to your inquiry within 30 days.
 
 ---
 
-## Disclaimer
+## Understand Our Service Limitations
 
-One Tap OK is not a medical device and should not be used as a substitute for professional medical advice, emergency services, or monitoring systems. Always call emergency services (911, 999, 112, etc.) in actual emergencies.
-
----
-
-## Acknowledgment
-
-By using One Tap OK, you acknowledge that you have read and understood this Privacy Policy and agree to its terms.
+Use responsibly - OneTapSafe is not a medical device and should not be used as a substitute for professional medical advice, emergency services, or monitoring systems. Always call emergency services (911, 999, 112, etc.) in actual emergencies.
 
 ---
 
-**One Tap OK - Peace of Mind, Privacy First**
+## Acknowledge Your Agreement
+
+Confirm your understanding - by using OneTapSafe, you acknowledge that you have read and understood this Privacy Policy and agree to its terms.
+
+---
+
+**OneTapSafe - Peace of Mind, Privacy First**
 
 Last Updated: January 22, 2026  
 Version: 1.0

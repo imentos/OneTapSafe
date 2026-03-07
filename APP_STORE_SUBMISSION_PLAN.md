@@ -1,9 +1,9 @@
 # OneTapOK - App Store Submission Plan
 
 ## 📱 App Overview
-**App Name:** One Tap OK  
-**Subtitle:** Lock Screen Daily Check-In  
-**Category:** Health & Fitness (or Lifestyle)  
+**App Name:** OneTapSafe (or consider: SafeSignal, DailySafe, LockCheck)  
+**Subtitle:** Daily Safety Check for Seniors  
+**Category:** Health & Fitness (or Medical)  
 **Version:** 1.0  
 **Build:** 1  
 **Minimum iOS:** 16.1+ (required for Live Activities)
@@ -14,83 +14,106 @@
 
 ### Primary Keywords
 ```
-one tap ok, one tap check in, lock screen check in, daily safety check, 
-safety check app, elderly check in, live activity check in, daily check in app,
-senior safety app, peace of mind app, lock screen safety
+senior safety, elderly check in, lock screen check in, daily safety check, 
+wellness check, caregiver app, aging parent, live activity check in, 
+family safety, peace of mind, senior wellness
 ```
 
 ### App Store Title (30 chars max)
-**"One Tap OK"**
+**"OneTapSafe"** (or "SafeSignal" / "LockCheck")
 
 ### Subtitle (30 chars max)
-**"Lock Screen Daily Check-In"**
+**"Daily Safety Check for Seniors"**
 
 ### Promotional Text (170 chars)
 ```
-Peace of mind with one tap per day. Check in from your lock screen using Live Activities. 
-No GPS tracking. No complexity. Just simple daily safety.
+Lock screen check-ins for elderly loved ones. Uses Live Activity - no unlocking needed. 
+Family gets alerts if check-in missed. Peace of mind for caregivers.
 ```
 
 ### Description (4000 chars max)
 ```
-ONE TAP FROM YOUR LOCK SCREEN
+LOCK SCREEN CHECK-IN FOR ELDERLY LOVED ONES
 
-One Tap OK is the simplest way to let loved ones know you're okay. Check in daily with a single tap directly from your lock screen - no unlocking, no app opening required.
+OneTapSafe helps families stay connected with aging parents or vulnerable loved ones through simple daily check-ins using iOS Live Activity on the lock screen. No unlocking required. No GPS tracking. Just peace of mind.
 
-PERFECT FOR:
-- Elderly living alone
-- Adult children caring for parents
-- Solo travelers
-- People with anxiety who want reassurance
-- Families wanting lightweight daily safety
+DESIGNED FOR SENIORS & CAREGIVERS:
+- Elderly parents living alone
+- Adult children caring for aging relatives  
+- Seniors who want to reassure family
+- Caregivers monitoring wellness
+- Families separated by distance
+
+THE LIVE ACTIVITY ADVANTAGE:
+Unlike traditional apps, OneTapSafe uses iOS Live Activity technology to put the check-in button directly on the lock screen. Seniors don't need to remember Face ID, passcodes, or navigate through apps - just tap the button that's always visible.
 
 HOW IT WORKS:
-1. Set a daily reminder time
-2. Add a trusted emergency contact
-3. Tap "I'm OK" from your lock screen when reminded
-4. If you miss a check-in, your contact gets notified
+1. Senior receives daily reminder at their preferred time
+2. Live Activity appears on lock screen with "I'm Safe" button
+3. Single tap confirms they're okay
+4. If check-in is missed, family receives automatic alert
 
-KEY FEATURES:
+KEY FEATURES FOR ELDERLY USERS:
 
-LOCK SCREEN CHECK-IN
-Use iOS Live Activities to check in without unlocking your phone. The "I'm OK" button appears right on your lock screen and Dynamic Island.
+LOCK SCREEN LIVE ACTIVITY
+Check in without unlocking phone. Perfect for seniors who forget passcodes or struggle with Face ID.
+
+ALWAYS VISIBLE
+Button stays on lock screen and Dynamic Island. Can't get lost in app folders.
+
+SIMPLE INTERFACE
+Large buttons, clear text, no confusing menus. Designed specifically for older adults.
 
 DAILY REMINDERS
-Set your preferred check-in time. Get a gentle reminder notification each day.
+Set preferred check-in time. Gentle notifications ensure routine wellness checks.
 
-TRUSTED CONTACTS
-Add emergency contacts who will be notified if you miss a check-in. Currently supports 1 contact in the free version.
+FAMILY ALERTS
+Trusted contacts notified automatically if check-in is missed. Configurable grace period.
 
 CHECK-IN HISTORY
-View your check-in streak and history for the last 7, 14, or 30 days. Track your consistency.
+Track consistency over 7, 14, or 30 days. Celebrate streaks.
 
-PRIVACY-FIRST
-No GPS tracking. No data collection. All data stored locally on your device. You control everything.
+PRIVACY FIRST
+No GPS tracking. No location monitoring. All data stored locally on device.
 
-SIMPLE AND RELIABLE
-Just one action per day. No complicated features. No overwhelming options. It just works.
+MULTIPLE CONTACTS
+Add emergency contacts who receive SMS or email alerts.
 
-MISSED CHECK-IN ALERTS:
-If you forget to check in, the app gives you a grace period, then notifies your trusted contact via SMS or email with your pre-set message.
+CUSTOMIZABLE
+Set check-in schedule, grace periods, and notification preferences.
 
-WHY ONE TAP OK?
-Unlike other safety apps, we don't track your location 24/7. We don't sell your data. We don't have confusing features. We focus on one thing: a simple daily check-in that gives peace of mind to you and your loved ones.
+WHY FAMILIES CHOOSE OneTapSafe:
+
+PEACE OF MIND FOR CAREGIVERS
+Know your aging parent is okay each day without calling to check. Automatic alerts only when needed.
+
+INDEPENDENCE FOR SENIORS
+Maintain autonomy while giving family reassurance. No constant monitoring or tracking.
+
+EASIER THAN PHONE CALLS
+Seniors just tap once. No dialing, no conversations if they're not feeling chatty.
+
+PERFECT FOR MEMORY ISSUES
+Lock screen button is always visible. Hard to forget when it's staring at you.
+
+TECHNICAL INNOVATION SERVING SENIORS:
+We leverage iOS Live Activity - the same technology that shows sports scores and delivery tracking on your lock screen - to make wellness checks accessible to elderly users who struggle with modern technology.
 
 REQUIREMENTS:
-- iOS 16.1 or later
-- Notification permissions (for daily reminders)
-- Live Activities support (built into iOS)
+- iOS 16.1 or later (Live Activity support)
+- iPhone with iOS Live Activity capability
+- Notification permissions for daily reminders
 
-NO ADS. NO SUBSCRIPTIONS. NO HIDDEN COSTS.
+FREE TO USE. NO SUBSCRIPTIONS. NO ADS.
 
-Download One Tap OK today and give yourself and your loved ones peace of mind with just one tap per day.
+Download OneTapSafe today and give your family peace of mind through simple, dignified daily check-ins.
 
-Note: This app is not a medical device and should not be used for emergency services. Always call emergency services (911, etc.) in actual emergencies.
+NOTE: This app is not a medical device and should not replace emergency services. Always call 911 for emergencies.
 ```
 
 ### Keywords (100 chars max)
 ```
-check in,safety,elderly,senior,lock screen,daily,reminder,live activity,peace of mind,family
+senior,elderly,wellness,caregiver,aging parent,lock screen,live activity,family safety,daily check
 ```
 
 ---
@@ -106,28 +129,28 @@ check in,safety,elderly,senior,lock screen,daily,reminder,live activity,peace of
 
 **1. Lock Screen Live Activity (Hero Shot)**
 - Visual: iPhone lock screen showing Live Activity with large "I'm OK" button and countdown
-- Caption: "Check In from Your Lock Screen"
-- Subtitle: "No unlocking required"
+- Caption: "Check In Without Unlocking Your Phone"
+- Subtitle: "Stay Safe - Perfect for Seniors Who Forget Passcodes"
 
 **2. Dynamic Island Compact**
 - Visual: iPhone with Dynamic Island showing timer countdown
-- Caption: "Stay Visible in Dynamic Island"
-- Subtitle: "Always know when to check in"
+- Caption: "See Your Reminder at a Glance"
+- Subtitle: "Never Miss Your Daily Wellness Check"
 
 **3. Home Screen Dashboard**
 - Visual: Main app screen showing check-in status, last check-in time, and contact info
-- Caption: "Simple Daily Check-In"
-- Subtitle: "One tap for peace of mind"
+- Caption: "Navigate Easily with Large Clear Buttons"
+- Subtitle: "Designed Specifically for Older Adults"
 
 **4. Check-In History**
 - Visual: History view showing streak of successful check-ins with green checkmarks
-- Caption: "Track Your Check-In Streak"
-- Subtitle: "View your consistency"
+- Caption: "Track Your Loved One's Daily Safety"
+- Subtitle: "Get Peace of Mind with Consistent Check-Ins"
 
 **5. Settings & Contacts**
 - Visual: Settings screen showing reminder time picker and trusted contact
-- Caption: "Set It and Forget It"
-- Subtitle: "Customize your schedule and contacts"
+- Caption: "Set Up Emergency Alerts in Minutes"
+- Subtitle: "Add Family Contacts Who Get Notified Automatically"
 
 ---
 
@@ -368,49 +391,62 @@ check in,safety,elderly,senior,lock screen,daily,reminder,live activity,peace of
 ## 📝 Sample Privacy Policy Content
 
 ```
-Privacy Policy for One Tap OK
+Privacy Policy for OneTapSafe
 
 Last updated: [Date]
 
-OVERVIEW
-One Tap OK is committed to protecting your privacy. This app is designed 
-with privacy as a core principle.
+YOUR PRIVACY COMES FIRST
 
-DATA COLLECTION
-We do NOT collect, store, or transmit any personal data to external servers.
+OneTapSafe protects your privacy by design. Keep your data on your device, 
+share nothing with external servers, and maintain complete control over your 
+information.
 
-LOCAL STORAGE ONLY
-All data (check-in history, contact information, settings) is stored locally 
-on your device using iOS UserDefaults. This data never leaves your device 
-except when:
-- You manually share it via export feature
-- iOS backups your device to iCloud (controlled by your iOS settings)
+ENJOY COMPLETE DATA PRIVACY
 
-CONTACT NOTIFICATIONS
-When you miss a check-in, the app uses your device's native SMS or Email 
-apps to notify your trusted contact. We do not store or access the content 
-of these messages.
+Control your own data - everything stays on your device. We never collect, 
+store, or transmit any personal information to our servers or third parties.
 
-PERMISSIONS
-- Notifications: Required for daily reminders and missed check-in alerts
-- Live Activities: Used to display check-in button on lock screen
+KEEP YOUR DATA LOCAL AND SECURE
 
-NO THIRD-PARTY SERVICES
-This app does not use:
-- Analytics services
-- Advertising networks
-- Third-party SDKs
-- Location tracking
+Store all data locally on your device using iOS UserDefaults. Your check-in 
+history, contact information, and settings remain private and secure. 
 
-YOUR RIGHTS
-- You can delete all data at any time via Settings > Reset All Data
-- You can remove the app and all data will be deleted from your device
+Your data leaves your device only when:
+- You manually share it through the export feature
+- iOS automatically backs up your device to iCloud (you control this in iOS settings)
 
-CONTACT
-For privacy questions, contact: [your-email]
+SEND NOTIFICATIONS YOUR WAY
 
-CHANGES
-We may update this policy. Check this page for updates.
+Notify your trusted contacts using your device's native SMS or Email apps when 
+you miss a check-in. We never store or access the content of these messages.
+
+USE ESSENTIAL PERMISSIONS ONLY
+
+Grant two simple permissions to use OneTapSafe:
+- Notifications: Receive daily reminders and missed check-in alerts
+- Live Activities: Display check-in button on your lock screen
+
+TRUST OUR NO-TRACKING COMMITMENT
+
+Enjoy an app with zero third-party services:
+- No analytics services tracking your behavior
+- No advertising networks collecting your data
+- No third-party SDKs accessing your information
+- No location tracking monitoring your whereabouts
+
+CONTROL YOUR DATA COMPLETELY
+
+Delete all data anytime through Settings > Reset All Data. Remove the app and 
+all associated data disappears from your device permanently.
+
+GET SUPPORT WHEN NEEDED
+
+Contact us with privacy questions at: [your-email]
+
+STAY INFORMED ABOUT UPDATES
+
+Check this page regularly for policy updates. We'll notify you of any significant 
+changes through the app.
 ```
 
 ---
