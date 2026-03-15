@@ -206,12 +206,24 @@ final class DataStore: ObservableObject {
     // MARK: - Debug
     
     func resetAllData() {
+        // Reset all data
         checkInHistory = []
         trustedContacts = []
         lastCheckInDate = nil
+        lastNotificationDate = nil
+        userName = ""
+        reminderEnabled = true
+        dailyReminderTime = Calendar.current.date(from: DateComponents(hour: 9, minute: 0)) ?? Date()
         
+        // Clear all UserDefaults
         defaults.removeObject(forKey: Keys.checkInHistory)
         defaults.removeObject(forKey: Keys.trustedContacts)
         defaults.removeObject(forKey: Keys.lastCheckInDate)
+        defaults.removeObject(forKey: Keys.lastNotificationDate)
+        defaults.removeObject(forKey: Keys.userName)
+        defaults.removeObject(forKey: Keys.reminderEnabled)
+        defaults.removeObject(forKey: Keys.dailyReminderTime)
+        
+        print("🔄 All data reset to defaults")
     }
 }
