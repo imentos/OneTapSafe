@@ -18,12 +18,13 @@ final class ContactNotifier {
     // MARK: - Notify Contacts
     
     func notifyContacts(for missedCheckIn: Date) {
-        let contacts = DataStore.shared.trustedContacts
+        let allContacts = DataStore.shared.trustedContacts
+        let contacts = allContacts.filter { $0.isVerified }
         
-        print("📞 Notifying contacts - Found \(contacts.count) contact(s)")
+        print("📞 Notifying contacts - Found \(contacts.count) verified contact(s) out of \(allContacts.count) total")
         
         guard !contacts.isEmpty else {
-            print("⚠️ No contacts to notify")
+            print("⚠️ No verified contacts to notify")
             return
         }
         
@@ -59,12 +60,13 @@ final class ContactNotifier {
     // MARK: - Emergency Alert
     
     func sendEmergencyAlert() {
-        let contacts = DataStore.shared.trustedContacts
+        let allContacts = DataStore.shared.trustedContacts
+        let contacts = allContacts.filter { $0.isVerified }
         
-        print("🚨 EMERGENCY: Sending alert to \(contacts.count) contact(s)")
+        print("🚨 EMERGENCY: Sending alert to \(contacts.count) verified contact(s) out of \(allContacts.count) total")
         
         guard !contacts.isEmpty else {
-            print("⚠️ No contacts to notify for emergency")
+            print("⚠️ No verified contacts to notify for emergency")
             return
         }
         
@@ -245,6 +247,99 @@ final class ContactNotifier {
             }
         } catch {
             print("⚠️ [OneTapOK] Failed to send emergency email: \(error.localizedDescription)")
+        }
+    }
+    
+    // MARK: - Consent Request Email
+    
+    func sendConsentRequest(to email: String, contactName: String, verificationCode: String) async {
+        print("📧 [OneTapOK] Sending consent request email via Resend API...")
+        
+        guard let url = URL(string: "https://api.resend.com/emails") else {
+            print("❌ [OneTapOK] Invalid Resend API URL")
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("Bearer \(resendAPIKey)", forHTTPHeaderField: "Authorization")
+        
+        let emailSubject = "OneTap OK: Consent Request - Verify Your Contact"
+        
+        let emailPayload: [String: Any] = [
+            "from": "OneTap OK <notifications@northpoleapps.online>",
+            "to": [email],
+            "subject": emailSubject,
+            "html": """
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: white;">
+                    <div style="background: linear-gradient(135deg, #34C759 0%, #30D158 100%); padding: 30px; text-align: center;">
+                        <h1 style="color: white; margin: 0; font-size: 28px;">OneTap OK</h1>
+                        <p style="color: white; margin: 10px 0 0 0; font-size: 16px;">Emergency Contact Consent Request</p>
+                    </div>
+                    
+                    <div style="padding: 30px; color: #333;">
+                        <p>Hi \(contactName),</p>
+                        
+                        <p>Someone is adding you as an emergency contact in the OneTap OK app. This app helps people stay safe with daily safety check-ins.</p>
+                        
+                        <div style="background: #f8f9fa; border-left: 4px solid #34C759; padding: 20px; margin: 20px 0;">
+                            <p style="margin: 0 0 10px 0; font-weight: bold; color: #34C759;">Your Verification Code:</p>
+                            <p style="margin: 0; font-size: 32px; font-weight: bold; letter-spacing: 8px; color: #333; font-family: 'Courier New', monospace;">
+                                \(verificationCode)
+                            </p>
+                        </div>
+                        
+                        <h3 style="color: #34C759;">What This Means:</h3>
+                        <p>If you consent to be an emergency contact, you will receive notifications if:</p>
+                        <ul style="line-height: 1.8;">
+                            <li>The person misses their daily safety check-in</li>
+                            <li>The person triggers an emergency alert</li>
+                        </ul>
+                        
+                        <h3 style="color: #34C759;">How to Consent:</h3>
+                        <p>If you agree to be an emergency contact, <strong>share this verification code (\(verificationCode))</strong> with the person who added you. They will enter it in the app to complete the verification.</p>
+                        
+                        <div style="background: #fff3cd; border: 2px solid #ffc107; padding: 15px; margin: 20px 0; border-radius: 8px;">
+                            <p style="margin: 0; font-size: 14px; color: #856404;">
+                                <strong>⚠️ Important:</strong> Only share this code if you consent to receive emergency notifications. If you don't want to be an emergency contact, simply ignore this email and do not share the code.
+                            </p>
+                        </div>
+                        
+                        <p style="font-size: 14px; color: #666;">
+                            You can always ask to be removed as an emergency contact at any time.
+                        </p>
+                    </div>
+                    
+                    <div style="background: #f5f5f5; padding: 20px; text-align: center;">
+                        <p style="font-size: 12px; color: #666; margin: 0;">
+                            OneTap OK - Automated Safety Check-In System<br>
+                            Do not reply to this email.
+                        </p>
+                    </div>
+                </div>
+            """
+        ]
+        
+        do {
+            request.httpBody = try JSONSerialization.data(withJSONObject: emailPayload)
+            
+            print("📧 [OneTapOK] Sending consent request to Resend API...")
+            let (data, response) = try await URLSession.shared.data(for: request)
+            
+            if let httpResponse = response as? HTTPURLResponse {
+                let responseBody = String(data: data, encoding: .utf8) ?? "No response body"
+                print("📧 [OneTapOK] Resend API response status: \(httpResponse.statusCode)")
+                print("📧 [OneTapOK] Resend API response body: \(responseBody)")
+                
+                if (200...299).contains(httpResponse.statusCode) {
+                    print("✅ [OneTapOK] Consent request sent successfully to \(contactName)")
+                } else {
+                    print("⚠️ [OneTapOK] Consent request failed with status \(httpResponse.statusCode)")
+                }
+            }
+        } catch {
+            print("⚠️ [OneTapOK] Failed to send consent request: \(error.localizedDescription)")
         }
     }
     

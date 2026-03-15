@@ -16,6 +16,8 @@ struct AddContactView: View {
     @State private var notificationMethod: NotificationMethod = .email
     @State private var showPaywall = false
     @State private var showLimitAlert = false
+    @State private var showConsentInfo = false
+    @State private var generatedCode = ""
     
     var isValid: Bool {
         !name.isEmpty && !email.isEmpty
@@ -106,18 +108,41 @@ struct AddContactView: View {
             .sheet(isPresented: $showPaywall) {
                 PaywallView()
             }
+            .alert("Consent Request Sent", isPresented: $showConsentInfo) {
+                Button("OK") {
+                    dismiss()
+                }
+            } message: {
+                Text("A verification code (\(generatedCode)) has been sent to \(email). Ask your contact to share this code with you, then verify them in the Contacts tab to enable notifications.")
+            }
         }
     }
     
     private func addContact() {
+        // Generate verification code
+        let verificationCode = TrustedContact.generateVerificationCode()
+        generatedCode = verificationCode
+        
         let contact = TrustedContact(
             name: name,
             phoneNumber: phoneNumber.isEmpty ? nil : phoneNumber,
             email: email,
-            notificationMethod: notificationMethod
+            notificationMethod: notificationMethod,
+            consentStatus: .pending,
+            verificationCode: verificationCode
         )
+        
+        // Send consent email
+        Task {
+            await ContactNotifier.shared.sendConsentRequest(
+                to: email,
+                contactName: name,
+                verificationCode: verificationCode
+            )
+        }
+        
         dataStore.addContact(contact)
-        dismiss()
+        showConsentInfo = true
     }
 }
 

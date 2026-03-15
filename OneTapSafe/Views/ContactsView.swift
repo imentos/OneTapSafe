@@ -8,6 +8,9 @@ import SwiftUI
 struct ContactsView: View {
     @StateObject private var dataStore = DataStore.shared
     @State private var showingAddContact = false
+    @State private var contactToVerify: TrustedContact?
+    @State private var verificationCodeInput = ""
+    @State private var showVerificationError = false
     
     var body: some View {
         NavigationStack {
@@ -20,10 +23,21 @@ struct ContactsView: View {
                     )
                 } else {
                     ForEach(dataStore.trustedContacts) { contact in
-                        NavigationLink {
-                            EditContactView(contact: contact)
-                        } label: {
-                            ContactRow(contact: contact)
+                        HStack {
+                            NavigationLink {
+                                EditContactView(contact: contact)
+                            } label: {
+                                ContactRow(contact: contact)
+                            }
+                            
+                            if contact.consentStatus == .pending {
+                                Button("Verify") {
+                                    contactToVerify = contact
+                                    verificationCodeInput = ""
+                                }
+                                .buttonStyle(.bordered)
+                                .tint(.green)
+                            }
                         }
                     }
                     .onDelete(perform: deleteContacts)
@@ -48,6 +62,27 @@ struct ContactsView: View {
             .sheet(isPresented: $showingAddContact) {
                 AddContactView()
             }
+            .alert("Verify Contact", isPresented: Binding(
+                get: { contactToVerify != nil },
+                set: { if !$0 { contactToVerify = nil } }
+            )) {
+                TextField("6-digit code", text: $verificationCodeInput)
+                    .keyboardType(.numberPad)
+                Button("Verify") {
+                    verifyContact()
+                }
+                Button("Cancel", role: .cancel) {
+                    contactToVerify = nil
+                    verificationCodeInput = ""
+                }
+            } message: {
+                Text("Enter the 6-digit verification code that \(contactToVerify?.name ?? "your contact") received via email.")
+            }
+            .alert("Verification Failed", isPresented: $showVerificationError) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text("The code you entered doesn't match. Please check with your contact and try again.")
+            }
         }
     }
     
@@ -57,6 +92,27 @@ struct ContactsView: View {
             dataStore.deleteContact(contact)
         }
     }
+    
+    private func verifyContact() {
+        guard let contact = contactToVerify,
+              let storedCode = contact.verificationCode,
+              verificationCodeInput == storedCode else {
+            showVerificationError = true
+            return
+        }
+        
+        // Update contact status to verified
+        if let index = dataStore.trustedContacts.firstIndex(where: { $0.id == contact.id }) {
+            var updatedContact = contact
+            updatedContact.consentStatus = .verified
+            dataStore.trustedContacts[index] = updatedContact
+            dataStore.saveContacts()
+            FirebaseManager.shared.logEvent(name: "contact_verified")
+        }
+        
+        contactToVerify = nil
+        verificationCodeInput = ""
+    }
 }
 
 struct ContactRow: View {
@@ -64,8 +120,16 @@ struct ContactRow: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(contact.name)
-                .font(.headline)
+            HStack {
+                Text(contact.name)
+                    .font(.headline)
+                
+                if contact.consentStatus == .verified {
+                    Image(systemName: "checkmark.seal.fill")
+                        .foregroundColor(.green)
+                        .font(.caption)
+                }
+            }
             
             HStack {
                 Image(systemName: "envelope.fill")
@@ -87,13 +151,25 @@ struct ContactRow: View {
                 }
             }
             
-            Text(contact.notificationMethod.rawValue)
-                .font(.caption)
-                .padding(.horizontal, 8)
-                .padding(.vertical, 4)
-                .background(Color.green.opacity(0.2))
-                .foregroundColor(.green)
-                .cornerRadius(8)
+            HStack {
+                Text(contact.notificationMethod.rawValue)
+                    .font(.caption)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Color.green.opacity(0.2))
+                    .foregroundColor(.green)
+                    .cornerRadius(8)
+                
+                if contact.consentStatus == .pending {
+                    Text("⏳ Pending")
+                        .font(.caption)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(Color.orange.opacity(0.2))
+                        .foregroundColor(.orange)
+                        .cornerRadius(8)
+                }
+            }
         }
         .padding(.vertical, 4)
     }
