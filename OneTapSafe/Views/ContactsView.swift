@@ -102,13 +102,10 @@ struct ContactsView: View {
         }
         
         // Update contact status to verified
-        if let index = dataStore.trustedContacts.firstIndex(where: { $0.id == contact.id }) {
-            var updatedContact = contact
-            updatedContact.consentStatus = .verified
-            dataStore.trustedContacts[index] = updatedContact
-            dataStore.saveContacts()
-            FirebaseManager.shared.logEvent(name: "contact_verified")
-        }
+        var updatedContact = contact
+        updatedContact.consentStatus = .verified
+        dataStore.updateContact(updatedContact)
+        FirebaseManager.shared.logEvent(name: "contact_verified")
         
         contactToVerify = nil
         verificationCodeInput = ""
