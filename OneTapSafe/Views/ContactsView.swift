@@ -137,25 +137,27 @@ struct ContactRow: View {
                     .foregroundColor(.secondary)
             }
             
-            if let phoneNumber = contact.phoneNumber, !phoneNumber.isEmpty {
-                HStack {
-                    Image(systemName: "phone.fill")
-                        .foregroundColor(.green)
-                        .font(.caption)
-                    Text(phoneNumber)
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                }
-            }
+            // Phone Number - Hidden for free version
+            // if let phoneNumber = contact.phoneNumber, !phoneNumber.isEmpty {
+            //     HStack {
+            //         Image(systemName: "phone.fill")
+            //             .foregroundColor(.green)
+            //             .font(.caption)
+            //         Text(phoneNumber)
+            //             .font(.subheadline)
+            //             .foregroundColor(.secondary)
+            //     }
+            // }
             
             HStack {
-                Text(contact.notificationMethod.rawValue)
-                    .font(.caption)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(Color.green.opacity(0.2))
-                    .foregroundColor(.green)
-                    .cornerRadius(8)
+                // Notification method badge - Hidden for now (only Email)
+                // Text(contact.notificationMethod.rawValue)
+                //     .font(.caption)
+                //     .padding(.horizontal, 8)
+                //     .padding(.vertical, 4)
+                //     .background(Color.green.opacity(0.2))
+                //     .foregroundColor(.green)
+                //     .cornerRadius(8)
                 
                 if contact.consentStatus == .pending {
                     Text("⏳ Pending")

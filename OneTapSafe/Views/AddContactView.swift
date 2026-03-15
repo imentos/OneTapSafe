@@ -68,23 +68,25 @@ struct AddContactView: View {
                         .keyboardType(.emailAddress)
                         .textInputAutocapitalization(.never)
                         .disabled(!canAddContact)
-                    TextField("Phone Number (Optional)", text: $phoneNumber)
-                        .keyboardType(.phonePad)
-                        .disabled(!canAddContact)
+                    // Phone Number - Coming in Pro version
+                    // TextField("Phone Number (Optional)", text: $phoneNumber)
+                    //     .keyboardType(.phonePad)
+                    //     .disabled(!canAddContact)
                 }
                 
-                Section("Notification Method") {
-                    Picker("Method", selection: $notificationMethod) {
-                        ForEach(NotificationMethod.allCases, id: \.self) { method in
-                            Text(method.rawValue).tag(method)
-                        }
-                    }
-                    .pickerStyle(.segmented)
-                    .disabled(!canAddContact)
-                }
+                // Notification Method - Hidden for now (only Email supported)
+                // Section("Notification Method") {
+                //     Picker("Method", selection: $notificationMethod) {
+                //         ForEach(NotificationMethod.allCases, id: \.self) { method in
+                //             Text(method.rawValue).tag(method)
+                //         }
+                //     }
+                //     .pickerStyle(.segmented)
+                //     .disabled(!canAddContact)
+                // }
                 
                 Section {
-                    Text("This contact will be notified if you miss your daily check-in")
+                    Text("This contact will be notified via email if you miss your daily check-in or trigger an emergency alert")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }

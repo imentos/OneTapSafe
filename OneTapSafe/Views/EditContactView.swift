@@ -35,18 +35,20 @@ struct EditContactView: View {
                 TextField("Email", text: $email)
                     .keyboardType(.emailAddress)
                     .textInputAutocapitalization(.never)
-                TextField("Phone Number (Optional)", text: $phoneNumber)
-                    .keyboardType(.phonePad)
+                // Phone Number - Coming in Pro version
+                // TextField("Phone Number (Optional)", text: $phoneNumber)
+                //     .keyboardType(.phonePad)
             }
             
-            Section("Notification Method") {
-                Picker("Method", selection: $notificationMethod) {
-                    ForEach(NotificationMethod.allCases, id: \.self) { method in
-                        Text(method.rawValue).tag(method)
-                    }
-                }
-                .pickerStyle(.segmented)
-            }
+            // Notification Method - Hidden for now (only Email supported)
+            // Section("Notification Method") {
+            //     Picker("Method", selection: $notificationMethod) {
+            //         ForEach(NotificationMethod.allCases, id: \.self) { method in
+            //             Text(method.rawValue).tag(method)
+            //         }
+            //     }
+            //     .pickerStyle(.segmented)
+            // }
         }
         .navigationTitle("Edit Contact")
         .navigationBarTitleDisplayMode(.inline)
@@ -66,7 +68,10 @@ struct EditContactView: View {
             name: name,
             phoneNumber: phoneNumber.isEmpty ? nil : phoneNumber,
             email: email,
-            notificationMethod: notificationMethod
+            notificationMethod: notificationMethod,
+            consentStatus: contact.consentStatus,
+            verificationCode: contact.verificationCode,
+            dateAdded: contact.dateAdded
         )
         dataStore.updateContact(updatedContact)
         dismiss()
