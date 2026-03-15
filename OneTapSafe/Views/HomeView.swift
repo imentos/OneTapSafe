@@ -19,6 +19,10 @@ struct HomeView: View {
         dataStore.hasCheckedInToday()
     }
     
+    var hasVerifiedContacts: Bool {
+        dataStore.trustedContacts.contains { $0.isVerified }
+    }
+    
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -42,7 +46,7 @@ struct HomeView: View {
                     QuickInfoSection()
                     
                     // Emergency Alert Button
-                    if !dataStore.trustedContacts.isEmpty {
+                    if hasVerifiedContacts {
                         EmergencyAlertButton {
                             checkUserNameAndShowEmergencyConfirmation()
                         }
@@ -304,6 +308,14 @@ struct InfoRow: View {
 struct ContactSummaryCard: View {
     @StateObject private var dataStore = DataStore.shared
     
+    var verifiedContacts: [TrustedContact] {
+        dataStore.trustedContacts.filter { $0.isVerified }
+    }
+    
+    var pendingContacts: [TrustedContact] {
+        dataStore.trustedContacts.filter { !$0.isVerified }
+    }
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
@@ -329,15 +341,39 @@ struct ContactSummaryCard: View {
                 }
                 .padding(.vertical, 8)
             } else {
-                ForEach(dataStore.trustedContacts.prefix(3)) { contact in
+                // Show verified contacts
+                if !verifiedContacts.isEmpty {
+                    ForEach(verifiedContacts.prefix(3)) { contact in
+                        HStack {
+                            Image(systemName: "checkmark.seal.fill")
+                                .foregroundColor(.green)
+                            Text(contact.name)
+                                .font(.subheadline)
+                            Spacer()
+                            Text(contact.email)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                                .lineLimit(1)
+                        }
+                    }
+                }
+                
+                // Show pending contacts warning
+                if !pendingContacts.isEmpty {
                     HStack {
-                        Image(systemName: "person.circle.fill")
-                            .foregroundColor(.green)
-                        Text(contact.name)
-                            .font(.subheadline)
-                        Spacer()
-                        Text(contact.email)
-                            .font(.caption)
+                        Image(systemName: "clock.fill")
+                            .foregroundColor(.orange)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("\(pendingContacts.count) contact\(pendingContacts.count == 1 ? "" : "s") pending verification")
+                                .font(.caption)
+                                .fontWeight(.medium)
+                            Text("Tap Manage to verify")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    .padding(.vertical, 4)
+                }
                             .foregroundColor(.secondary)
                             .lineLimit(1)
                     }
