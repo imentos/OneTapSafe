@@ -12,7 +12,7 @@ struct SettingsView: View {
     @State private var showPaywall = false
     @State private var versionTapCount = 0
     @State private var showDebugSection = false
-    @State private var editedUserName = \"\"
+    @State private var editedUserName = ""
     @State private var isEditingName = false
     
     private var appVersion: String {
