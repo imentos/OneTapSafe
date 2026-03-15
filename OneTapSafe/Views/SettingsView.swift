@@ -70,9 +70,10 @@ struct SettingsView: View {
                     }
                 }
                 */
-                                Section(\"Your Profile\") {
+                
+                Section("Your Profile") {
                     HStack {
-                        Text(\"Your Name\")
+                        Text("Your Name")
                         Spacer()
                         Text(dataStore.userName)
                             .foregroundColor(.secondary)
@@ -80,16 +81,17 @@ struct SettingsView: View {
                             editedUserName = dataStore.userName
                             isEditingName = true
                         }) {
-                            Text(\"Edit\")
+                            Text("Edit")
                                 .font(.subheadline)
                         }
                     }
                     
-                    Text(\"This name will appear in emergency alerts sent to your contacts\")
+                    Text("This name will appear in emergency alerts sent to your contacts")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
-                                Section("Daily Reminder") {
+                
+                Section("Daily Reminder") {
                     Toggle("Enable Reminder", isOn: Binding(
                         get: { dataStore.reminderEnabled },
                         set: { enabled in
