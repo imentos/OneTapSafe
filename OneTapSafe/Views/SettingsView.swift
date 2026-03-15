@@ -72,11 +72,27 @@ struct SettingsView: View {
                 */
                 
                 Section("Your Profile") {
+                    if !dataStore.isUserNameValid() {
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .foregroundColor(.orange)
+                                Text("Name Required")
+                                    .font(.subheadline)
+                                    .fontWeight(.semibold)
+                            }
+                            Text("Please enter your name so emergency contacts know who's reaching out.")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        .padding(.vertical, 4)
+                    }
+                    
                     HStack {
                         Text("Your Name")
                         Spacer()
-                        Text(dataStore.userName)
-                            .foregroundColor(.secondary)
+                        Text(dataStore.userName.isEmpty ? "Not set" : dataStore.userName)
+                            .foregroundColor(dataStore.userName.isEmpty ? .orange : .secondary)
                         Button(action: {
                             editedUserName = dataStore.userName
                             isEditingName = true

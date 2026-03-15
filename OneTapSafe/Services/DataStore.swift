@@ -6,10 +6,6 @@
 import Foundation
 import Combine
 
-#if os(iOS)
-import UIKit
-#endif
-
 /// Local-first data storage using UserDefaults
 final class DataStore: ObservableObject {
     
@@ -81,27 +77,11 @@ final class DataStore: ObservableObject {
             lastNotificationDate = Date(timeIntervalSince1970: timeInterval)
         }
         
-        // Load or auto-detect user name
-        if let savedName = defaults.string(forKey: Keys.userName), !savedName.isEmpty {
+        // Load user name (default to empty - user will be prompted when needed)
+        if let savedName = defaults.string(forKey: Keys.userName) {
             userName = savedName
         } else {
-            // Auto-detect from device name (e.g., "John's iPhone" -> "John")
-            #if os(iOS)
-            let deviceName = UIDevice.current.name
-            // Try to extract first name by removing common suffixes
-            let cleanName = deviceName
-                .replacingOccurrences(of: "'s iPhone", with: "")
-                .replacingOccurrences(of: "'s iPad", with: "")
-                .replacingOccurrences(of: "'s iPod", with: "")
-                .replacingOccurrences(of: "'s Apple Watch", with: "")
-                .replacingOccurrences(of: "iPhone", with: "")
-                .replacingOccurrences(of: "iPad", with: "")
-                .trimmingCharacters(in: .whitespaces)
-            userName = cleanName.isEmpty ? "OneTap OK User" : cleanName
-            #else
-            userName = "OneTap OK User"
-            #endif
-            saveUserName()
+            userName = ""
         }
     }
     
@@ -177,6 +157,26 @@ final class DataStore: ObservableObject {
     func updateUserName(_ name: String) {
         userName = name.isEmpty ? "OneTap OK User" : name
         saveUserName()
+    }
+    
+    func isUserNameValid() -> Bool {
+        // Check if name is empty or looks like auto-generated device name
+        let trimmed = userName.trimmingCharacters(in: .whitespaces)
+        if trimmed.isEmpty || trimmed == "OneTap OK User" {
+            return false
+        }
+        
+        // Check if it looks like a device model name (contains common patterns)
+        let invalidPatterns = ["iPhone", "iPad", "iPod", "Pro", "Max", "Mini", "Plus", "Air"]
+        let hasInvalidPattern = invalidPatterns.contains { pattern in
+            trimmed.range(of: pattern, options: .caseInsensitive) != nil
+        }
+        
+        // Check if it's mostly numbers (like "17 Pro" -> "17")
+        let digitsOnly = trimmed.filter { $0.isNumber }
+        let isMostlyNumbers = !digitsOnly.isEmpty && Double(digitsOnly.count) / Double(trimmed.count) > 0.5
+        
+        return !hasInvalidPattern && !isMostlyNumbers
     }
     
     private func saveUserName() {

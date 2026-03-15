@@ -12,6 +12,8 @@ struct HomeView: View {
     @State private var showLiveActivityBanner = false
     @State private var showingEmergencyConfirmation = false
     @State private var showingEmergencySuccess = false
+    @State private var showNamePrompt = false
+    @State private var tempUserName = ""
     
     var hasCheckedInToday: Bool {
         dataStore.hasCheckedInToday()
@@ -42,7 +44,7 @@ struct HomeView: View {
                     // Emergency Alert Button
                     if !dataStore.trustedContacts.isEmpty {
                         EmergencyAlertButton {
-                            showingEmergencyConfirmation = true
+                            checkUserNameAndShowEmergencyConfirmation()
                         }
                     }
                     
@@ -70,6 +72,21 @@ struct HomeView: View {
             } message: {
                 Text("Your emergency contacts have been notified and will reach out to you immediately.")
             }
+            .alert("Enter Your Name", isPresented: $showNamePrompt) {
+                TextField("Your name", text: $tempUserName)
+                Button("Cancel", role: .cancel) {
+                    tempUserName = ""
+                }
+                Button("Save & Continue") {
+                    if !tempUserName.trimmingCharacters(in: .whitespaces).isEmpty {
+                        dataStore.updateUserName(tempUserName.trimmingCharacters(in: .whitespaces))
+                        showingEmergencyConfirmation = true
+                    }
+                    tempUserName = ""
+                }
+            } message: {
+                Text("Your name will appear in emergency alerts sent to your contacts. This helps them know who needs help.")
+            }
             .onAppear {
                 checkLiveActivityStatus()
                 FirebaseManager.shared.logHomeViewed()
@@ -86,6 +103,15 @@ struct HomeView: View {
     private func checkIn() {
         CheckInCoordinator.shared.handleCheckIn(method: .app)
         showingCheckInSuccess = true
+    }
+    
+    private func checkUserNameAndShowEmergencyConfirmation() {
+        if !dataStore.isUserNameValid() {
+            tempUserName = dataStore.userName
+            showNamePrompt = true
+        } else {
+            showingEmergencyConfirmation = true
+        }
     }
     
     private func sendEmergencyAlert() {

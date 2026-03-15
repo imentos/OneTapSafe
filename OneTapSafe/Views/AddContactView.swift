@@ -18,6 +18,8 @@ struct AddContactView: View {
     @State private var showLimitAlert = false
     @State private var showConsentInfo = false
     @State private var generatedCode = ""
+    @State private var showNamePrompt = false
+    @State private var tempUserName = ""
     
     var isValid: Bool {
         !name.isEmpty && !email.isEmpty
@@ -102,7 +104,7 @@ struct AddContactView: View {
                 
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Add") {
-                        addContact()
+                        checkUserNameAndAddContact()
                     }
                     .disabled(!isValid || !canAddContact)
                 }
@@ -117,6 +119,30 @@ struct AddContactView: View {
             } message: {
                 Text("A verification code (\(generatedCode)) has been sent to \(email). Ask your contact to share this code with you, then verify them in the Contacts tab to enable notifications.")
             }
+            .alert("Enter Your Name", isPresented: $showNamePrompt) {
+                TextField("Your name", text: $tempUserName)
+                Button("Cancel", role: .cancel) {
+                    tempUserName = ""
+                }
+                Button("Save & Continue") {
+                    if !tempUserName.trimmingCharacters(in: .whitespaces).isEmpty {
+                        dataStore.updateUserName(tempUserName.trimmingCharacters(in: .whitespaces))
+                        addContact()
+                    }
+                    tempUserName = ""
+                }
+            } message: {
+                Text("Your name will appear in emergency alerts sent to your contacts. This helps them know who needs help.")
+            }
+        }
+    }
+    
+    private func checkUserNameAndAddContact() {
+        if !dataStore.isUserNameValid() {
+            tempUserName = dataStore.userName
+            showNamePrompt = true
+        } else {
+            addContact()
         }
     }
     

@@ -28,7 +28,7 @@ final class ContactNotifier {
             return
         }
         
-        let userName = DataStore.shared.userName
+        let userName = DataStore.shared.userName.isEmpty ? "Your OneTap OK Contact" : DataStore.shared.userName
         
         let formatter = DateFormatter()
         formatter.dateStyle = .long
@@ -70,7 +70,7 @@ final class ContactNotifier {
             return
         }
         
-        let userName = DataStore.shared.userName
+        let userName = DataStore.shared.userName.isEmpty ? "Your OneTap OK Contact" : DataStore.shared.userName
         
         for contact in contacts {
             print("🚨 Sending emergency alert to: \(contact.name)")
