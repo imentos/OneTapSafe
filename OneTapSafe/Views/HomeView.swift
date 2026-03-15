@@ -374,10 +374,6 @@ struct ContactSummaryCard: View {
                     }
                     .padding(.vertical, 4)
                 }
-                            .foregroundColor(.secondary)
-                            .lineLimit(1)
-                    }
-                }
                 
                 if dataStore.trustedContacts.count > 3 {
                     Text("+\(dataStore.trustedContacts.count - 3) more")
