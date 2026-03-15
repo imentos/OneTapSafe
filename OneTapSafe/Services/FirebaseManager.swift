@@ -112,6 +112,12 @@ class FirebaseManager {
         ])
     }
     
+    /// Generic log event method for custom events
+    func logEvent(name: String, parameters: [String: Any]? = nil) {
+        Analytics.logEvent(name, parameters: parameters)
+        print("📊 Analytics: \(name)")
+    }
+    
     // MARK: - User Properties
     
     /// Set user properties for segmentation
