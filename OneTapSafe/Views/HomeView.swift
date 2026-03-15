@@ -10,6 +10,8 @@ struct HomeView: View {
     @StateObject private var dataStore = DataStore.shared
     @State private var showingCheckInSuccess = false
     @State private var showLiveActivityBanner = false
+    @State private var showingEmergencyConfirmation = false
+    @State private var showingEmergencySuccess = false
     
     var hasCheckedInToday: Bool {
         dataStore.hasCheckedInToday()
@@ -37,6 +39,13 @@ struct HomeView: View {
                     // Quick Info
                     QuickInfoSection()
                     
+                    // Emergency Alert Button
+                    if !dataStore.trustedContacts.isEmpty {
+                        EmergencyAlertButton {
+                            showingEmergencyConfirmation = true
+                        }
+                    }
+                    
                     // Contact Summary
                     ContactSummaryCard()
                 }
@@ -47,6 +56,19 @@ struct HomeView: View {
                 Button("OK", role: .cancel) {}
             } message: {
                 Text("Your safety check-in has been recorded. See you tomorrow!")
+            }
+            .alert("Send Emergency Alert?", isPresented: $showingEmergencyConfirmation) {
+                Button("Cancel", role: .cancel) {}
+                Button("Send Alert", role: .destructive) {
+                    sendEmergencyAlert()
+                }
+            } message: {
+                Text("This will immediately notify all your emergency contacts. Only use this if you need urgent help.")
+            }
+            .alert("Emergency Alert Sent", isPresented: $showingEmergencySuccess) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text("Your emergency contacts have been notified and will reach out to you immediately.")
             }
             .onAppear {
                 checkLiveActivityStatus()
@@ -64,6 +86,12 @@ struct HomeView: View {
     private func checkIn() {
         CheckInCoordinator.shared.handleCheckIn(method: .app)
         showingCheckInSuccess = true
+    }
+    
+    private func sendEmergencyAlert() {
+        ContactNotifier.shared.sendEmergencyAlert()
+        showingEmergencySuccess = true
+        FirebaseManager.shared.logEvent(name: "emergency_alert_sent")
     }
 }
 
@@ -171,6 +199,41 @@ struct CheckInButton: View {
             .foregroundColor(.white)
             .cornerRadius(16)
         }
+    }
+}
+
+// MARK: - Emergency Alert Button
+
+struct EmergencyAlertButton: View {
+    let action: () -> Void
+    
+    var body: some View {
+        VStack(spacing: 12) {
+            Button(action: action) {
+                HStack {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.title3)
+                    Text("Emergency Alert")
+                        .font(.title3)
+                        .bold()
+                }
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(Color.red)
+                .foregroundColor(.white)
+                .cornerRadius(16)
+            }
+            
+            Text("Sends immediate alert to all emergency contacts")
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+        }
+        .padding()
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(Color.red.opacity(0.3), lineWidth: 2)
+        )
     }
 }
 

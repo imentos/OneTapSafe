@@ -37,6 +37,139 @@ final class ContactNotifier {
         }
     }
     
+    // MARK: - Emergency Alert
+    
+    /// Sends immediate emergency alert to all contacts
+    func sendEmergencyAlert() {
+        let contacts = DataStore.shared.trustedContacts
+        
+        print("🚨 EMERGENCY: Sending alert to \(contacts.count) contact(s)")
+        
+        guard !contacts.isEmpty else {
+            print("⚠️ No contacts to notify for emergency")
+            return
+        }
+        
+        let userName = "OneTap OK User" // Could be customized in settings later
+        let currentTime = DateFormatter.localizedString(from: Date(), dateStyle: .long, timeStyle: .short)
+        
+        for contact in contacts {
+            print("🚨 Sending emergency alert to: \(contact.name)")
+            
+            // Send emergency email
+            sendEmergencyEmailNotification(
+                to: contact.email,
+                contactName: contact.name,
+                userName: userName,
+                currentTime: currentTime
+            )
+            
+            // Send SMS if available
+            if contact.notificationMethod == .sms || contact.notificationMethod == .both {
+                if let phoneNumber = contact.phoneNumber, !phoneNumber.isEmpty {
+                    sendEmergencySMS(to: contact)
+                }
+            }
+        }
+    }
+    
+    private func sendEmergencyEmailNotification(to email: String, contactName: String, userName: String, currentTime: String) {
+        guard let url = URL(string: emailServerURL) else {
+            print("❌ Invalid email server URL")
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        // Use a special emergency payload
+        let payload: [String: Any] = [
+            "email": email,
+            "contactName": contactName,
+            "userName": userName,
+            "isEmergency": true,
+            "currentTime": currentTime
+        ]
+        
+        do {
+            request.httpBody = try JSONSerialization.data(withJSONObject: payload)
+            
+            URLSession.shared.dataTask(with: request) { data, response, error in
+                if let error = error {
+                    print("❌ Failed to send emergency email to \(contactName): \(error.localizedDescription)")
+                    return
+                }
+                
+                if let httpResponse = response as? HTTPURLResponse {
+                    if httpResponse.statusCode == 200 {
+                        print("✅ Emergency email sent successfully to \(contactName)")
+                        DispatchQueue.main.async {
+                            NotificationManager.shared.sendContactNotifiedAlert(contactName: contactName)
+                        }
+                    } else {
+                        print("❌ Server error \(httpResponse.statusCode) sending emergency email to \(contactName)")
+                    }
+                }
+            }.resume()
+        } catch {
+            print("❌ Failed to encode emergency email payload: \(error)")
+        }
+    }
+    
+    private func sendEmergencySMS(to contact: TrustedContact) {
+        guard let phoneNumber = contact.phoneNumber, !phoneNumber.isEmpty else {
+            print("⚠️ No phone number for contact: \(contact.name)")
+            return
+        }
+        
+        let message = createEmergencyMessage()
+        
+        // Clean phone number (remove any formatting)
+        let cleanPhone = phoneNumber.replacingOccurrences(of: "[^0-9+]", with: "", options: .regularExpression)
+        
+        // Build SMS URL with proper encoding
+        let urlString = "sms:\(cleanPhone)?body=\(message.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")"
+        
+        print("📱 Opening SMS URL for emergency: \(urlString)")
+        
+        if let url = URL(string: urlString) {
+            #if os(iOS)
+            DispatchQueue.main.async {
+                if UIApplication.shared.canOpenURL(url) {
+                    UIApplication.shared.open(url) { success in
+                        if success {
+                            print("✅ Emergency SMS prepared for \(contact.name)")
+                        } else {
+                            print("❌ Failed to open Messages app")
+                        }
+                    }
+                } else {
+                    print("❌ Cannot open SMS URL - Messages app not available")
+                }
+            }
+            #endif
+        } else {
+            print("❌ Invalid SMS URL")
+        }
+    }
+    
+    private func createEmergencyMessage() -> String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .short
+        
+        return """
+        🚨 EMERGENCY ALERT
+        
+        Your contact has triggered an emergency alert from OneTap OK at \(formatter.string(from: Date())).
+        
+        Please reach out IMMEDIATELY.
+        
+        - Sent by OneTap OK
+        """
+    }
+    
     // MARK: - Automated Notifications (Server-based)
     
     private func sendAutomatedNotifications(contacts: [TrustedContact], missedCheckIn: Date) {
