@@ -139,7 +139,8 @@ struct AddContactView: View {
             await ContactNotifier.shared.sendConsentRequest(
                 to: email,
                 contactName: name,
-                verificationCode: verificationCode
+                verificationCode: verificationCode,
+                userName: dataStore.userName
             )
         }
         

@@ -6,6 +6,10 @@
 import Foundation
 import Combine
 
+#if os(iOS)
+import UIKit
+#endif
+
 /// Local-first data storage using UserDefaults
 final class DataStore: ObservableObject {
     
@@ -22,6 +26,7 @@ final class DataStore: ObservableObject {
         static let lastCheckInDate = "lastCheckInDate"
         static let reminderEnabled = "reminderEnabled"
         static let lastNotificationDate = "lastNotificationDate"
+        static let userName = "userName"
     }
     
     // MARK: - Published Properties
@@ -32,6 +37,7 @@ final class DataStore: ObservableObject {
     @Published var lastCheckInDate: Date?
     @Published var reminderEnabled: Bool = true
     @Published var lastNotificationDate: Date?
+    @Published var userName: String = ""
     
     // MARK: - Initialization
     
@@ -73,6 +79,29 @@ final class DataStore: ObservableObject {
         // Load last notification date
         if let timeInterval = defaults.object(forKey: Keys.lastNotificationDate) as? TimeInterval {
             lastNotificationDate = Date(timeIntervalSince1970: timeInterval)
+        }
+        
+        // Load or auto-detect user name
+        if let savedName = defaults.string(forKey: Keys.userName), !savedName.isEmpty {
+            userName = savedName
+        } else {
+            // Auto-detect from device name (e.g., "John's iPhone" -> "John")
+            #if os(iOS)
+            let deviceName = UIDevice.current.name
+            // Try to extract first name by removing common suffixes
+            let cleanName = deviceName
+                .replacingOccurrences(of: "'s iPhone", with: "")
+                .replacingOccurrences(of: "'s iPad", with: "")
+                .replacingOccurrences(of: "'s iPod", with: "")
+                .replacingOccurrences(of: "'s Apple Watch", with: "")
+                .replacingOccurrences(of: "iPhone", with: "")
+                .replacingOccurrences(of: "iPad", with: "")
+                .trimmingCharacters(in: .whitespaces)
+            userName = cleanName.isEmpty ? "OneTap OK User" : cleanName
+            #else
+            userName = "OneTap OK User"
+            #endif
+            saveUserName()
         }
     }
     
@@ -143,6 +172,15 @@ final class DataStore: ObservableObject {
     func toggleReminder(_ enabled: Bool) {
         reminderEnabled = enabled
         defaults.set(enabled, forKey: Keys.reminderEnabled)
+    }
+    
+    func updateUserName(_ name: String) {
+        userName = name.isEmpty ? "OneTap OK User" : name
+        saveUserName()
+    }
+    
+    private func saveUserName() {
+        defaults.set(userName, forKey: Keys.userName)
     }
     
     // MARK: - Persistence

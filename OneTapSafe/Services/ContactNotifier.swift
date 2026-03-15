@@ -28,7 +28,7 @@ final class ContactNotifier {
             return
         }
         
-        let userName = "OneTap OK User" // Could be customized in settings later
+        let userName = DataStore.shared.userName
         
         let formatter = DateFormatter()
         formatter.dateStyle = .long
@@ -70,7 +70,7 @@ final class ContactNotifier {
             return
         }
         
-        let userName = "OneTap OK User"
+        let userName = DataStore.shared.userName
         
         for contact in contacts {
             print("🚨 Sending emergency alert to: \(contact.name)")
@@ -252,7 +252,7 @@ final class ContactNotifier {
     
     // MARK: - Consent Request Email
     
-    func sendConsentRequest(to email: String, contactName: String, verificationCode: String) async {
+    func sendConsentRequest(to email: String, contactName: String, verificationCode: String, userName: String) async {
         print("📧 [OneTapOK] Sending consent request email via Resend API...")
         
         guard let url = URL(string: "https://api.resend.com/emails") else {
@@ -281,7 +281,7 @@ final class ContactNotifier {
                     <div style="padding: 30px; color: #333;">
                         <p>Hi \(contactName),</p>
                         
-                        <p>Someone is adding you as an emergency contact in the OneTap OK app. This app helps people stay safe with daily safety check-ins.</p>
+                        <p><strong>\(userName)</strong> is adding you as an emergency contact in the OneTap OK app. This app helps people stay safe with daily safety check-ins.</p>
                         
                         <div style="background: #f8f9fa; border-left: 4px solid #34C759; padding: 20px; margin: 20px 0;">
                             <p style="margin: 0 0 10px 0; font-weight: bold; color: #34C759;">Your Verification Code:</p>
@@ -291,14 +291,14 @@ final class ContactNotifier {
                         </div>
                         
                         <h3 style="color: #34C759;">What This Means:</h3>
-                        <p>If you consent to be an emergency contact, you will receive notifications if:</p>
+                        <p>If you consent to be an emergency contact for \(userName), you will receive notifications if:</p>
                         <ul style="line-height: 1.8;">
-                            <li>The person misses their daily safety check-in</li>
-                            <li>The person triggers an emergency alert</li>
+                            <li>\(userName) misses their daily safety check-in</li>
+                            <li>\(userName) triggers an emergency alert</li>
                         </ul>
                         
                         <h3 style="color: #34C759;">How to Consent:</h3>
-                        <p>If you agree to be an emergency contact, <strong>share this verification code (\(verificationCode))</strong> with the person who added you. They will enter it in the app to complete the verification.</p>
+                        <p>If you agree to be an emergency contact for \(userName), <strong>share this verification code (\(verificationCode))</strong> with them. They will enter it in the app to complete the verification.</p>
                         
                         <div style="background: #fff3cd; border: 2px solid #ffc107; padding: 15px; margin: 20px 0; border-radius: 8px;">
                             <p style="margin: 0; font-size: 14px; color: #856404;">

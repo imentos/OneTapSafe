@@ -12,6 +12,8 @@ struct SettingsView: View {
     @State private var showPaywall = false
     @State private var versionTapCount = 0
     @State private var showDebugSection = false
+    @State private var editedUserName = \"\"
+    @State private var isEditingName = false
     
     private var appVersion: String {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
@@ -68,8 +70,26 @@ struct SettingsView: View {
                     }
                 }
                 */
-                
-                Section("Daily Reminder") {
+                                Section(\"Your Profile\") {
+                    HStack {
+                        Text(\"Your Name\")
+                        Spacer()
+                        Text(dataStore.userName)
+                            .foregroundColor(.secondary)
+                        Button(action: {
+                            editedUserName = dataStore.userName
+                            isEditingName = true
+                        }) {
+                            Text(\"Edit\")
+                                .font(.subheadline)
+                        }
+                    }
+                    
+                    Text(\"This name will appear in emergency alerts sent to your contacts\")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+                                Section("Daily Reminder") {
                     Toggle("Enable Reminder", isOn: Binding(
                         get: { dataStore.reminderEnabled },
                         set: { enabled in
@@ -175,6 +195,20 @@ struct SettingsView: View {
                 }
             } message: {
                 Text("This will delete all check-in history and contacts. This action cannot be undone.")
+            }
+            .alert("Edit Your Name", isPresented: $isEditingName) {
+                TextField("Name", text: $editedUserName)
+                Button("Cancel", role: .cancel) {
+                    editedUserName = ""
+                }
+                Button("Save") {
+                    if !editedUserName.trimmingCharacters(in: .whitespaces).isEmpty {
+                        dataStore.updateUserName(editedUserName.trimmingCharacters(in: .whitespaces))
+                    }
+                    editedUserName = ""
+                }
+            } message: {
+                Text("Enter your name as you'd like it to appear in emergency alerts")
             }
         }
     }
