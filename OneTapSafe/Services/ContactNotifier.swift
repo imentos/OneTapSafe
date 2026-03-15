@@ -109,7 +109,7 @@ final class ContactNotifier {
         let emailSubject = "⚠️ \(userName) Missed Daily Check-In - OneTap OK"
         
         let emailPayload: [String: Any] = [
-            "from": "OneTap OK <onboarding@resend.dev>",
+            "from": "OneTap OK <notifications@northpoleapps.online>",
             "to": [email],
             "subject": emailSubject,
             "html": """
@@ -182,7 +182,7 @@ final class ContactNotifier {
         let emailSubject = "🚨 EMERGENCY ALERT - \(userName) needs immediate help"
         
         let emailPayload: [String: Any] = [
-            "from": "OneTap OK <onboarding@resend.dev>",
+            "from": "OneTap OK <notifications@northpoleapps.online>",
             "to": [email],
             "subject": emailSubject,
             "html": """

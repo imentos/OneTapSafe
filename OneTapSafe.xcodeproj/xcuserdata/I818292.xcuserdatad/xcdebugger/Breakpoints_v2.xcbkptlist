@@ -32,7 +32,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "43"
             endingLineNumber = "43"
-            landmarkName = "sendAutomatedNotifications(contacts:missedCheckIn:)"
+            landmarkName = "notifyContacts(for:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -49,6 +49,22 @@
             startingLineNumber = "172"
             endingLineNumber = "172"
             landmarkName = "updateSubscriptionStatus()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "B610F2F7-AFE7-4FBE-A3AC-C499AE579CC9"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "OneTapSafe/Services/ContactNotifier.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "21"
+            endingLineNumber = "21"
+            landmarkName = "notifyContacts(for:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
