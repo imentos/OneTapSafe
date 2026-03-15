@@ -10,9 +10,8 @@ final class ContactNotifier {
     
     static let shared = ContactNotifier()
     
-    // Configuration for automated notifications
-    private let automatedNotificationsEnabled = true
-    private let emailServerURL = "https://onetapsafe-email-server-production.up.railway.app/api/send-alert"
+    // Configuration for Resend API
+    private let resendAPIKey = "re_UqtXCbNP_KJc9zLe2pvyvpj14U6pwLtRv"  // Same key from ShowUpBooster
     
     private init() {}
     
@@ -28,18 +27,37 @@ final class ContactNotifier {
             return
         }
         
-        // Use automated server-based notifications if available
-        if automatedNotificationsEnabled {
-            sendAutomatedNotifications(contacts: contacts, missedCheckIn: missedCheckIn)
-        } else {
-            // Fallback to manual URL scheme (opens Messages/Mail apps)
-            sendManualNotifications(contacts: contacts, missedCheckIn: missedCheckIn)
+        let userName = "OneTap OK User" // Could be customized in settings later
+        
+        let formatter = DateFormatter()
+        formatter.dateStyle = .long
+        formatter.timeStyle = .short
+        let missedTimeString = formatter.string(from: missedCheckIn)
+        
+        for contact in contacts {
+            print("📞 Sending notification to: \(contact.name)")
+            
+            // Send email via Resend API
+            Task {
+                await sendEmailViaResend(
+                    to: contact.email,
+                    contactName: contact.name,
+                    userName: userName,
+                    missedCheckIn: missedTimeString
+                )
+            }
+            
+            // For SMS, check if phone number is available
+            if contact.notificationMethod == .sms || contact.notificationMethod == .both {
+                if let phoneNumber = contact.phoneNumber, !phoneNumber.isEmpty {
+                    sendSMS(to: contact, missedCheckIn: missedCheckIn)
+                }
+            }
         }
     }
     
     // MARK: - Emergency Alert
     
-    /// Sends immediate emergency alert to all contacts
     func sendEmergencyAlert() {
         let contacts = DataStore.shared.trustedContacts
         
@@ -50,19 +68,19 @@ final class ContactNotifier {
             return
         }
         
-        let userName = "OneTap OK User" // Could be customized in settings later
-        let currentTime = DateFormatter.localizedString(from: Date(), dateStyle: .long, timeStyle: .short)
+        let userName = "OneTap OK User"
         
         for contact in contacts {
             print("🚨 Sending emergency alert to: \(contact.name)")
             
             // Send emergency email
-            sendEmergencyEmailNotification(
-                to: contact.email,
-                contactName: contact.name,
-                userName: userName,
-                currentTime: currentTime
-            )
+            Task {
+                await sendEmergencyEmailViaResend(
+                    to: contact.email,
+                    contactName: contact.name,
+                    userName: userName
+                )
+            }
             
             // Send SMS if available
             if contact.notificationMethod == .sms || contact.notificationMethod == .both {
@@ -73,49 +91,164 @@ final class ContactNotifier {
         }
     }
     
-    private func sendEmergencyEmailNotification(to email: String, contactName: String, userName: String, currentTime: String) {
-        guard let url = URL(string: emailServerURL) else {
-            print("❌ Invalid email server URL")
+    // MARK: - Resend API Email Sending
+    
+    private func sendEmailViaResend(to email: String, contactName: String, userName: String, missedCheckIn: String) async {
+        print("📧 [OneTapOK] Starting email notification via Resend API...")
+        
+        guard let url = URL(string: "https://api.resend.com/emails") else {
+            print("❌ [OneTapOK] Invalid Resend API URL")
             return
         }
         
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("Bearer \(resendAPIKey)", forHTTPHeaderField: "Authorization")
         
-        // Use a special emergency payload
-        let payload: [String: Any] = [
-            "email": email,
-            "contactName": contactName,
-            "userName": userName,
-            "isEmergency": true,
-            "currentTime": currentTime
+        let emailSubject = "⚠️ \(userName) Missed Daily Check-In - OneTap OK"
+        
+        let emailPayload: [String: Any] = [
+            "from": "OneTap OK <onboarding@resend.dev>",
+            "to": [email],
+            "subject": emailSubject,
+            "html": """
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                    <h2 style="color: #d32f2f;">⚠️ Missed Check-In Alert</h2>
+                    
+                    <p>Hi <strong>\(contactName)</strong>,</p>
+                    
+                    <p>This is an automated safety alert from <strong>OneTap OK</strong>.</p>
+                    
+                    <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0;">
+                        <strong>\(userName)</strong> has missed their daily safety check-in.
+                    </div>
+                    
+                    <p><strong>Expected check-in:</strong> \(missedCheckIn)<br>
+                    <strong>Current time:</strong> \(Date().formatted(date: .abbreviated, time: .shortened))</p>
+                    
+                    <p>This message was sent because you are listed as an emergency contact.</p>
+                    
+                    <p><strong>Please reach out to \(userName) to ensure they are safe.</strong></p>
+                    
+                    <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">
+                    
+                    <p style="font-size: 12px; color: #666;">
+                        OneTap OK - Automated Safety Check-In System<br>
+                        Do not reply to this email.
+                    </p>
+                </div>
+            """
         ]
         
         do {
-            request.httpBody = try JSONSerialization.data(withJSONObject: payload)
+            request.httpBody = try JSONSerialization.data(withJSONObject: emailPayload)
             
-            URLSession.shared.dataTask(with: request) { data, response, error in
-                if let error = error {
-                    print("❌ Failed to send emergency email to \(contactName): \(error.localizedDescription)")
-                    return
-                }
+            print("📧 [OneTapOK] Sending email to Resend API...")
+            let (data, response) = try await URLSession.shared.data(for: request)
+            
+            if let httpResponse = response as? HTTPURLResponse {
+                let responseBody = String(data: data, encoding: .utf8) ?? "No response body"
+                print("📧 [OneTapOK] Resend API response status: \(httpResponse.statusCode)")
+                print("📧 [OneTapOK] Resend API response body: \(responseBody)")
                 
-                if let httpResponse = response as? HTTPURLResponse {
-                    if httpResponse.statusCode == 200 {
-                        print("✅ Emergency email sent successfully to \(contactName)")
-                        DispatchQueue.main.async {
-                            NotificationManager.shared.sendContactNotifiedAlert(contactName: contactName)
-                        }
-                    } else {
-                        print("❌ Server error \(httpResponse.statusCode) sending emergency email to \(contactName)")
+                if (200...299).contains(httpResponse.statusCode) {
+                    print("✅ [OneTapOK] Email sent successfully to \(contactName)")
+                    DispatchQueue.main.async {
+                        NotificationManager.shared.sendContactNotifiedAlert(contactName: contactName)
                     }
+                } else {
+                    print("⚠️ [OneTapOK] Email notification failed with status \(httpResponse.statusCode)")
                 }
-            }.resume()
+            }
         } catch {
-            print("❌ Failed to encode emergency email payload: \(error)")
+            print("⚠️ [OneTapOK] Failed to send email notification: \(error.localizedDescription)")
         }
     }
+    
+    private func sendEmergencyEmailViaResend(to email: String, contactName: String, userName: String) async {
+        print("📧 [OneTapOK] Sending EMERGENCY email via Resend API...")
+        
+        guard let url = URL(string: "https://api.resend.com/emails") else {
+            print("❌ [OneTapOK] Invalid Resend API URL")
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("Bearer \(resendAPIKey)", forHTTPHeaderField: "Authorization")
+        
+        let emailSubject = "🚨 EMERGENCY ALERT - \(userName) needs immediate help"
+        
+        let emailPayload: [String: Any] = [
+            "from": "OneTap OK <onboarding@resend.dev>",
+            "to": [email],
+            "subject": emailSubject,
+            "html": """
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 3px solid #d32f2f;">
+                    <div style="background: #d32f2f; color: white; padding: 20px; text-align: center;">
+                        <h1 style="margin: 0; font-size: 28px;">🚨 EMERGENCY ALERT</h1>
+                    </div>
+                    
+                    <div style="padding: 30px;">
+                        <p style="font-size: 16px;">Hi <strong>\(contactName)</strong>,</p>
+                        
+                        <div style="background: #ffebee; border-left: 6px solid #d32f2f; padding: 20px; margin: 20px 0;">
+                            <p style="margin: 0; font-size: 18px; color: #d32f2f; font-weight: bold;">
+                                \(userName) has triggered an EMERGENCY ALERT
+                            </p>
+                        </div>
+                        
+                        <p><strong>Alert time:</strong> \(Date().formatted(date: .abbreviated, time: .shortened))</p>
+                        
+                        <div style="background: #fff3cd; border: 2px solid #ff9800; padding: 20px; margin: 20px 0; text-align: center;">
+                            <p style="margin: 0; font-size: 16px; font-weight: bold; color: #d32f2f;">
+                                ⚠️ THIS IS AN URGENT REQUEST FOR HELP ⚠️
+                            </p>
+                        </div>
+                        
+                        <p style="font-size: 16px; font-weight: bold;">
+                            Please reach out to \(userName) IMMEDIATELY to ensure they are safe.
+                        </p>
+                    </div>
+                    
+                    <div style="background: #f5f5f5; padding: 20px; text-align: center;">
+                        <p style="font-size: 12px; color: #666; margin: 0;">
+                            OneTap OK - Automated Safety Check-In System<br>
+                            Do not reply to this email.
+                        </p>
+                    </div>
+                </div>
+            """
+        ]
+        
+        do {
+            request.httpBody = try JSONSerialization.data(withJSONObject: emailPayload)
+            
+            print("📧 [OneTapOK] Sending emergency email to Resend API...")
+            let (data, response) = try await URLSession.shared.data(for: request)
+            
+            if let httpResponse = response as? HTTPURLResponse {
+                let responseBody = String(data: data, encoding: .utf8) ?? "No response body"
+                print("📧 [OneTapOK] Resend API response status: \(httpResponse.statusCode)")
+                print("📧 [OneTapOK] Resend API response body: \(responseBody)")
+                
+                if (200...299).contains(httpResponse.statusCode) {
+                    print("✅ [OneTapOK] Emergency email sent successfully to \(contactName)")
+                    DispatchQueue.main.async {
+                        NotificationManager.shared.sendContactNotifiedAlert(contactName: contactName)
+                    }
+                } else {
+                    print("⚠️ [OneTapOK] Emergency email failed with status \(httpResponse.statusCode)")
+                }
+            }
+        } catch {
+            print("⚠️ [OneTapOK] Failed to send emergency email: \(error.localizedDescription)")
+        }
+    }
+    
+    // MARK: - SMS
     
     private func sendEmergencySMS(to contact: TrustedContact) {
         guard let phoneNumber = contact.phoneNumber, !phoneNumber.isEmpty else {
@@ -123,7 +256,15 @@ final class ContactNotifier {
             return
         }
         
-        let message = createEmergencyMessage()
+        let message = """
+        🚨 EMERGENCY ALERT
+        
+        Your contact has triggered an emergency alert from OneTap OK at \(Date().formatted(date: .abbreviated, time: .shortened)).
+        
+        Please reach out IMMEDIATELY.
+        
+        - Sent by OneTap OK
+        """
         
         // Clean phone number (remove any formatting)
         let cleanPhone = phoneNumber.replacingOccurrences(of: "[^0-9+]", with: "", options: .regularExpression)
@@ -154,124 +295,6 @@ final class ContactNotifier {
         }
     }
     
-    private func createEmergencyMessage() -> String {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        formatter.timeStyle = .short
-        
-        return """
-        🚨 EMERGENCY ALERT
-        
-        Your contact has triggered an emergency alert from OneTap OK at \(formatter.string(from: Date())).
-        
-        Please reach out IMMEDIATELY.
-        
-        - Sent by OneTap OK
-        """
-    }
-    
-    // MARK: - Automated Notifications (Server-based)
-    
-    private func sendAutomatedNotifications(contacts: [TrustedContact], missedCheckIn: Date) {
-        let userName = "OneTap OK User" // Could be customized in settings later
-        
-        let formatter = DateFormatter()
-        formatter.dateStyle = .long
-        formatter.timeStyle = .short
-        let missedTimeString = formatter.string(from: missedCheckIn)
-        
-        for contact in contacts {
-            print("📞 Sending automated notification to: \(contact.name)")
-            
-            // Send emails (now always available since email is required)
-            sendEmailNotification(
-                to: contact.email,
-                contactName: contact.name,
-                userName: userName,
-                missedCheckIn: missedTimeString
-            )
-            
-            // For SMS, check if phone number is available
-            if contact.notificationMethod == .sms || contact.notificationMethod == .both {
-                if let phoneNumber = contact.phoneNumber, !phoneNumber.isEmpty {
-                    sendSMS(to: contact, missedCheckIn: missedCheckIn)
-                }
-            }
-        }
-    }
-    
-    private func sendEmailNotification(to email: String, contactName: String, userName: String, missedCheckIn: String) {
-        guard let url = URL(string: emailServerURL) else {
-            print("❌ Invalid email server URL")
-            return
-        }
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        
-        let payload: [String: String] = [
-            "email": email,
-            "contactName": contactName,
-            "userName": userName,
-            "missedCheckIn": missedCheckIn
-        ]
-        
-        do {
-            request.httpBody = try JSONEncoder().encode(payload)
-            
-            URLSession.shared.dataTask(with: request) { data, response, error in
-                if let error = error {
-                    print("❌ Failed to send email to \(contactName): \(error.localizedDescription)")
-                    return
-                }
-                
-                if let httpResponse = response as? HTTPURLResponse {
-                    if httpResponse.statusCode == 200 {
-                        print("✅ Email sent successfully to \(contactName)")
-                        DispatchQueue.main.async {
-                            NotificationManager.shared.sendContactNotifiedAlert(contactName: contactName)
-                        }
-                    } else {
-                        print("❌ Server error \(httpResponse.statusCode) sending email to \(contactName)")
-                    }
-                }
-            }.resume()
-        } catch {
-            print("❌ Failed to encode email payload: \(error)")
-        }
-    }
-    
-    // MARK: - Manual Notifications (URL Schemes)
-    
-    private func sendManualNotifications(contacts: [TrustedContact], missedCheckIn: Date) {
-        for contact in contacts {
-            print("📞 Processing contact: \(contact.name) - Method: \(contact.notificationMethod.rawValue)")
-            
-            switch contact.notificationMethod {
-            case .sms:
-                if let phoneNumber = contact.phoneNumber, !phoneNumber.isEmpty {
-                    sendSMS(to: contact, missedCheckIn: missedCheckIn)
-                }
-            case .email:
-                sendEmail(to: contact, email: contact.email, missedCheckIn: missedCheckIn)
-            case .both:
-                if let phoneNumber = contact.phoneNumber, !phoneNumber.isEmpty {
-                    sendSMS(to: contact, missedCheckIn: missedCheckIn)
-                }
-                sendEmail(to: contact, email: contact.email, missedCheckIn: missedCheckIn)
-            }
-            
-            NotificationManager.shared.sendContactNotifiedAlert(contactName: contact.name)
-        }
-    }
-    
-    private func fallbackToManualNotifications() {
-        print("⚠️ Falling back to manual notification method")
-        let contacts = DataStore.shared.trustedContacts
-        let missedCheckIn = DataStore.shared.lastCheckInDate ?? Date()
-        sendManualNotifications(contacts: contacts, missedCheckIn: missedCheckIn)
-    }
     
     // MARK: - SMS
     
@@ -309,28 +332,6 @@ final class ContactNotifier {
             #endif
         } else {
             print("❌ Invalid SMS URL")
-        }
-    }
-    
-    // MARK: - Email
-    
-    private func sendEmail(to contact: TrustedContact, email: String, missedCheckIn: Date) {
-        // Note: This requires MFMailComposeViewController which needs UI integration
-        // For now, we'll open Mail app with pre-filled content
-        let subject = "⚠️ Safety Check-In Missed"
-        let body = createAlertMessage(missedCheckIn: missedCheckIn)
-        
-        let mailto = "mailto:\(email)?subject=\(subject.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")&body=\(body.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")"
-        
-        if let url = URL(string: mailto) {
-            #if os(iOS)
-            DispatchQueue.main.async {
-                if UIApplication.shared.canOpenURL(url) {
-                    UIApplication.shared.open(url)
-                    print("✅ Email notification prepared for \(contact.name)")
-                }
-            }
-            #endif
         }
     }
     
