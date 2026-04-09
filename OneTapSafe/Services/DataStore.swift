@@ -23,6 +23,9 @@ final class DataStore: ObservableObject {
         static let reminderEnabled = "reminderEnabled"
         static let lastNotificationDate = "lastNotificationDate"
         static let userName = "userName"
+        static let hasCompletedOnboarding = "hasCompletedOnboarding"
+        static let onboardingGoal = "onboardingGoal"
+        static let onboardingPainPoints = "onboardingPainPoints"
     }
     
     // MARK: - Published Properties
@@ -34,6 +37,9 @@ final class DataStore: ObservableObject {
     @Published var reminderEnabled: Bool = true
     @Published var lastNotificationDate: Date?
     @Published var userName: String = ""
+    @Published var hasCompletedOnboarding: Bool = false
+    @Published var onboardingGoal: String = ""
+    @Published var onboardingPainPoints: [String] = []
     
     // MARK: - Initialization
     
@@ -82,6 +88,17 @@ final class DataStore: ObservableObject {
             userName = savedName
         } else {
             userName = ""
+        }
+
+        hasCompletedOnboarding = defaults.bool(forKey: Keys.hasCompletedOnboarding)
+
+        if let goal = defaults.string(forKey: Keys.onboardingGoal) {
+            onboardingGoal = goal
+        }
+
+        if let data = defaults.data(forKey: Keys.onboardingPainPoints),
+           let points = try? JSONDecoder().decode([String].self, from: data) {
+            onboardingPainPoints = points
         }
     }
     
@@ -182,6 +199,26 @@ final class DataStore: ObservableObject {
     private func saveUserName() {
         defaults.set(userName, forKey: Keys.userName)
     }
+
+    func completeOnboarding(goal: String, painPoints: [String]) {
+        onboardingGoal = goal
+        onboardingPainPoints = painPoints
+        hasCompletedOnboarding = true
+        defaults.set(true, forKey: Keys.hasCompletedOnboarding)
+        defaults.set(goal, forKey: Keys.onboardingGoal)
+        if let data = try? JSONEncoder().encode(painPoints) {
+            defaults.set(data, forKey: Keys.onboardingPainPoints)
+        }
+    }
+
+    func resetOnboarding() {
+        hasCompletedOnboarding = false
+        onboardingGoal = ""
+        onboardingPainPoints = []
+        defaults.removeObject(forKey: Keys.hasCompletedOnboarding)
+        defaults.removeObject(forKey: Keys.onboardingGoal)
+        defaults.removeObject(forKey: Keys.onboardingPainPoints)
+    }
     
     // MARK: - Persistence
     
@@ -212,18 +249,24 @@ final class DataStore: ObservableObject {
         lastCheckInDate = nil
         lastNotificationDate = nil
         userName = ""
+        hasCompletedOnboarding = false
+        onboardingGoal = ""
+        onboardingPainPoints = []
         reminderEnabled = true
         dailyReminderTime = Calendar.current.date(from: DateComponents(hour: 9, minute: 0)) ?? Date()
-        
+
         // Clear all UserDefaults
         defaults.removeObject(forKey: Keys.checkInHistory)
         defaults.removeObject(forKey: Keys.trustedContacts)
         defaults.removeObject(forKey: Keys.lastCheckInDate)
         defaults.removeObject(forKey: Keys.lastNotificationDate)
         defaults.removeObject(forKey: Keys.userName)
+        defaults.removeObject(forKey: Keys.hasCompletedOnboarding)
+        defaults.removeObject(forKey: Keys.onboardingGoal)
+        defaults.removeObject(forKey: Keys.onboardingPainPoints)
         defaults.removeObject(forKey: Keys.reminderEnabled)
         defaults.removeObject(forKey: Keys.dailyReminderTime)
-        
+
         print("🔄 All data reset to defaults")
     }
 }
