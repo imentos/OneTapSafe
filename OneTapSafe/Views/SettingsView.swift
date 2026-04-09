@@ -201,6 +201,15 @@ struct SettingsView: View {
                         }
                     }
                 }
+
+                #if DEBUG
+                Section("Developer") {
+                    Button("Reset Onboarding (Debug)") {
+                        DataStore.shared.resetOnboarding()
+                    }
+                    .foregroundColor(.red)
+                }
+                #endif
             }
             .navigationTitle("Settings")
             .sheet(isPresented: $showPaywall) {
@@ -261,12 +270,25 @@ struct SettingsView: View {
     private func testMissedCheckIn() {
         print("🧪 Testing missed check-in flow...")
         
-        // Reset notification date for testing
+        // Reset notification date for testing - properly clear both DataStore and UserDefaults
         DataStore.shared.lastNotificationDate = nil
         UserDefaults.standard.removeObject(forKey: "lastNotificationDate")
         
-        // Use last check-in date or yesterday if none exists
-        let lastCheckIn = DataStore.shared.lastCheckInDate ?? Calendar.current.date(byAdding: .day, value: -1, to: Date())!
+        // Force save to ensure it's cleared
+        UserDefaults.standard.synchronize()
+        
+        // Set lastCheckInDate to yesterday if it doesn't exist (simulate missed check-in)
+        if DataStore.shared.lastCheckInDate == nil {
+            let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
+            DataStore.shared.lastCheckInDate = yesterday
+            UserDefaults.standard.set(yesterday.timeIntervalSince1970, forKey: "lastCheckInDate")
+            UserDefaults.standard.synchronize()
+            print("🧪 Set lastCheckInDate to yesterday for testing")
+        }
+        
+        print("🧪 lastNotificationDate reset: \(DataStore.shared.lastNotificationDate == nil ? "✅ nil" : "❌ still set")")
+        print("🧪 hasNotifiedContactsToday: \(DataStore.shared.hasNotifiedContactsToday() ? "❌ true" : "✅ false")")
+        print("🧪 lastCheckInDate: \(DataStore.shared.lastCheckInDate != nil ? "✅ set" : "❌ nil")")
         
         // Trigger missed check-in notification with forceTest flag
         CheckInCoordinator.shared.checkMissedCheckInStatus(forceTest: true)
@@ -278,10 +300,16 @@ struct SettingsView: View {
         print("\n🧪 ========== TEST DEADLINE FLOW START ==========")
         print("🧪 Current time: \(Date())")
         
-        // Clear today's check-in
-        DataStore.shared.lastCheckInDate = nil
-        UserDefaults.standard.removeObject(forKey: "lastCheckInDate")
-        print("🧪 Cleared today's check-in")
+        // Set lastCheckInDate to yesterday (simulate that user checked in yesterday but not today)
+        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
+        DataStore.shared.lastCheckInDate = yesterday
+        UserDefaults.standard.set(yesterday.timeIntervalSince1970, forKey: "lastCheckInDate")
+        print("🧪 Set lastCheckInDate to yesterday (not checked in today)")
+        
+        // Clear notification date to allow test
+        DataStore.shared.lastNotificationDate = nil
+        UserDefaults.standard.removeObject(forKey: "lastNotificationDate")
+        UserDefaults.standard.synchronize()
         
         // Schedule deadline notification for 10 seconds from now
         let deadline = Calendar.current.date(byAdding: .second, value: 10, to: Date())!
