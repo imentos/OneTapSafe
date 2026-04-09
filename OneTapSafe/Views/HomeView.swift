@@ -41,10 +41,7 @@ struct HomeView: View {
                             checkIn()
                         }
                     }
-                    
-                    // Quick Info
-                    QuickInfoSection()
-                    
+
                     // Emergency Alert Button
                     if hasVerifiedContacts {
                         EmergencyAlertButton {
@@ -119,8 +116,12 @@ struct HomeView: View {
     }
     
     private func sendEmergencyAlert() {
-        ContactNotifier.shared.sendEmergencyAlert()
-        showingEmergencySuccess = true
+        Task {
+            await ContactNotifier.shared.sendEmergencyAlert()
+            await MainActor.run {
+                showingEmergencySuccess = true
+            }
+        }
         FirebaseManager.shared.logEvent(name: "emergency_alert_sent")
     }
 }

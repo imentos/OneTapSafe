@@ -90,11 +90,10 @@ struct OB1WelcomeView: View {
                 Text("I'm OK")
                     .font(.headline.bold())
                     .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
+                    .frame(width: 120)
                     .padding(.vertical, 10)
                     .background(Color.green)
                     .cornerRadius(12)
-                    .padding(.horizontal, 16)
             }
             .padding(.horizontal, 12)
         }

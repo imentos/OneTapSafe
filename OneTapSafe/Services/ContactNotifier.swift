@@ -17,7 +17,7 @@ final class ContactNotifier {
     
     // MARK: - Notify Contacts
     
-    func notifyContacts(for missedCheckIn: Date) {
+    func notifyContacts(for missedCheckIn: Date) async {
         let allContacts = DataStore.shared.trustedContacts
         let contacts = allContacts.filter { $0.isVerified }
         
@@ -38,15 +38,13 @@ final class ContactNotifier {
         for contact in contacts {
             print("📞 Sending notification to: \(contact.name)")
             
-            // Send email via Resend API
-            Task {
-                await sendEmailViaResend(
-                    to: contact.email,
-                    contactName: contact.name,
-                    userName: userName,
-                    missedCheckIn: missedTimeString
-                )
-            }
+            // Send email via Resend API - AWAIT to ensure it completes
+            await sendEmailViaResend(
+                to: contact.email,
+                contactName: contact.name,
+                userName: userName,
+                missedCheckIn: missedTimeString
+            )
             
             // For SMS, check if phone number is available
             if contact.notificationMethod == .sms || contact.notificationMethod == .both {
@@ -59,7 +57,7 @@ final class ContactNotifier {
     
     // MARK: - Emergency Alert
     
-    func sendEmergencyAlert() {
+    func sendEmergencyAlert() async {
         let allContacts = DataStore.shared.trustedContacts
         let contacts = allContacts.filter { $0.isVerified }
         
@@ -75,14 +73,12 @@ final class ContactNotifier {
         for contact in contacts {
             print("🚨 Sending emergency alert to: \(contact.name)")
             
-            // Send emergency email
-            Task {
-                await sendEmergencyEmailViaResend(
-                    to: contact.email,
-                    contactName: contact.name,
-                    userName: userName
-                )
-            }
+            // Send emergency email - AWAIT to ensure it completes
+            await sendEmergencyEmailViaResend(
+                to: contact.email,
+                contactName: contact.name,
+                userName: userName
+            )
             
             // Send SMS if available
             if contact.notificationMethod == .sms || contact.notificationMethod == .both {

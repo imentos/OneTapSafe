@@ -7,7 +7,9 @@ import SwiftUI
 
 struct ContactsView: View {
     @StateObject private var dataStore = DataStore.shared
+    @StateObject private var subscriptionManager = SubscriptionManager.shared
     @State private var showingAddContact = false
+    @State private var showingPaywall = false
     @State private var contactToVerify: TrustedContact?
     @State private var verificationCodeInput = ""
     @State private var showVerificationError = false
@@ -47,7 +49,11 @@ struct ContactsView: View {
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     Button {
-                        showingAddContact = true
+                        if subscriptionManager.canAddContact(currentCount: dataStore.trustedContacts.count) {
+                            showingAddContact = true
+                        } else {
+                            showingPaywall = true
+                        }
                     } label: {
                         Image(systemName: "plus")
                     }
@@ -61,6 +67,9 @@ struct ContactsView: View {
             }
             .sheet(isPresented: $showingAddContact) {
                 AddContactView()
+            }
+            .sheet(isPresented: $showingPaywall) {
+                OB11PaywallView(vm: OnboardingViewModel(), onComplete: { showingPaywall = false })
             }
             .alert("Verify Contact", isPresented: Binding(
                 get: { contactToVerify != nil },

@@ -42,10 +42,9 @@ final class SubscriptionManager: ObservableObject {
         !purchasedProductIDs.isEmpty
     }
     
-    /// Maximum number of contacts allowed (unlimited for now, can enable paywall later)
+    /// Maximum number of contacts allowed
     var maxContacts: Int {
-        return Int.max  // Temporarily unlimited for everyone
-        // TODO: Enable paywall later: isPro ? Int.max : 1
+        isPro ? Int.max : 1
     }
     
     private var updateListenerTask: Task<Void, Never>?

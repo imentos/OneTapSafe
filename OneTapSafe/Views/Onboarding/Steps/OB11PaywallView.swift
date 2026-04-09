@@ -58,10 +58,10 @@ struct OB11PaywallView: View {
 
                 // Pro features
                 VStack(spacing: 14) {
-                    ProFeatureRow(icon: "person.3.fill",           text: "Up to 5 emergency contacts (free: 1)")
-                    ProFeatureRow(icon: "envelope.badge.fill",     text: "Email + SMS alerts")
-                    ProFeatureRow(icon: "calendar.badge.clock",    text: "Multiple check-ins per day")
-                    ProFeatureRow(icon: "chart.line.uptrend.xyaxis", text: "Full safety history")
+                    ProFeatureRow(icon: "person.3.fill",             text: "Unlimited emergency contacts (free: 1)")
+                    ProFeatureRow(icon: "envelope.badge.fill",       text: "Email alerts to all contacts")
+                    ProFeatureRow(icon: "lock.shield.fill",          text: "Lock screen check-in via Live Activity")
+                    ProFeatureRow(icon: "chart.line.uptrend.xyaxis", text: "Full 30-day safety history")
                 }
                 .padding()
                 .background(Color(.systemGray6))

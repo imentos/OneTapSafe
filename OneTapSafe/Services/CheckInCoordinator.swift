@@ -4,6 +4,7 @@
 //
 
 import Foundation
+import UIKit
 import ActivityKit
 import Combine
 
@@ -76,6 +77,8 @@ final class CheckInCoordinator: ObservableObject {
     // MARK: - Handle Missed Check-In
     
     func handleMissedCheckIn(fromScheduledNotification: Bool = false) {
+        print("🔔 handleMissedCheckIn called (fromScheduledNotification: \(fromScheduledNotification))")
+        
         guard !DataStore.shared.hasCheckedInToday() else {
             print("ℹ️ Check-in already completed today")
             return
@@ -87,11 +90,16 @@ final class CheckInCoordinator: ObservableObject {
             return
         }
         
+        print("✅ Passed all guards - proceeding with missed check-in handling")
+        
         missedCheckIn = true
         
         // Send user notification (skip if deadline notification already showed it)
         if !fromScheduledNotification {
+            print("📱 Sending missed check-in notification to user...")
             NotificationManager.shared.sendMissedCheckInNotification()
+        } else {
+            print("ℹ️ Skipping user notification (already shown by scheduled notification)")
         }
         
         // Update Live Activity to show overdue
@@ -100,10 +108,34 @@ final class CheckInCoordinator: ObservableObject {
             LiveActivityManager.shared.updateActivity(deadline: deadline, isOverdue: true)
         }
         
-        // Notify emergency contacts
+        // Notify emergency contacts - use background task to ensure completion
         let missedCheckInTime = DataStore.shared.lastCheckInDate ?? Date()
         let contactsCount = DataStore.shared.trustedContacts.count
-        ContactNotifier.shared.notifyContacts(for: missedCheckInTime)
+        
+        print("📧 Preparing to notify \(contactsCount) emergency contact(s)...")
+        
+        // Request background execution time for critical notification
+        var backgroundTaskID: UIBackgroundTaskIdentifier = .invalid
+        backgroundTaskID = UIApplication.shared.beginBackgroundTask(withName: "EmergencyContactNotification") {
+            // Cleanup if we run out of time
+            print("⚠️ Background time expired before notifications completed")
+            UIApplication.shared.endBackgroundTask(backgroundTaskID)
+            backgroundTaskID = .invalid
+        }
+        
+        print("🔄 Starting background task for email sending...")
+        
+        // Send notifications in background task
+        Task {
+            await ContactNotifier.shared.notifyContacts(for: missedCheckInTime)
+            print("✅ All emergency contact notifications sent successfully")
+            
+            // End background task
+            if backgroundTaskID != .invalid {
+                UIApplication.shared.endBackgroundTask(backgroundTaskID)
+                backgroundTaskID = .invalid
+            }
+        }
         
         // Mark that we've notified today
         DataStore.shared.markContactsNotified()
@@ -112,7 +144,7 @@ final class CheckInCoordinator: ObservableObject {
         let hoursLate = Int(Date().timeIntervalSince(missedCheckInTime) / 3600)
         FirebaseManager.shared.logMissedCheckIn(hoursLate: hoursLate, contactsNotified: contactsCount)
         
-        print("⚠️ Missed check-in handled - contacts notified")
+        print("⚠️ Missed check-in handled - contacts being notified with background task support")
     }
     
     // MARK: - Check Status
@@ -139,8 +171,21 @@ final class CheckInCoordinator: ObservableObject {
             return
         }
         
+        // If called from scheduled notification, the notification firing IS the deadline
+        // No need to check shouldHaveCheckedInByNow() - just verify user hasn't checked in
+        if fromScheduledNotification {
+            if !hasCheckedIn {
+                print("⏰ Scheduled deadline notification - user hasn't checked in")
+                handleMissedCheckIn(fromScheduledNotification: true)
+            } else {
+                print("✅ Scheduled deadline notification - user already checked in, skipping")
+            }
+            return
+        }
+        
+        // For manual checks (app launch, etc), verify both conditions
         if !hasCheckedIn && shouldHaveCheckedInByNow() {
-            handleMissedCheckIn(fromScheduledNotification: fromScheduledNotification)
+            handleMissedCheckIn(fromScheduledNotification: false)
         }
     }
     

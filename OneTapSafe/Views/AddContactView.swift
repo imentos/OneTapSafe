@@ -22,7 +22,12 @@ struct AddContactView: View {
     @State private var tempUserName = ""
     
     var isValid: Bool {
-        !name.isEmpty && !email.isEmpty
+        !name.trimmingCharacters(in: .whitespaces).isEmpty && isValidEmail(email)
+    }
+
+    private func isValidEmail(_ value: String) -> Bool {
+        let regex = #"^[A-Z0-9a-z._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$"#
+        return value.range(of: regex, options: .regularExpression) != nil
     }
     
     var canAddContact: Bool {
@@ -70,6 +75,11 @@ struct AddContactView: View {
                         .keyboardType(.emailAddress)
                         .textInputAutocapitalization(.never)
                         .disabled(!canAddContact)
+                    if !email.isEmpty && !isValidEmail(email) {
+                        Text("Please enter a valid email address")
+                            .font(.caption)
+                            .foregroundColor(.red)
+                    }
                     // Phone Number - Coming in Pro version
                     // TextField("Phone Number (Optional)", text: $phoneNumber)
                     //     .keyboardType(.phonePad)

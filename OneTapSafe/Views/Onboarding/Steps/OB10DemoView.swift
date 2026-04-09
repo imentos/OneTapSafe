@@ -83,7 +83,7 @@ struct OB10DemoView: View {
     private var mockLockScreen: some View {
         ZStack {
             // Phone frame
-            RoundedRectangle(cornerRadius: 36)
+            RoundedRectangle(cornerRadius: 28)
                 .fill(
                     LinearGradient(
                         colors: [Color(red: 0.1, green: 0.15, blue: 0.35),
@@ -92,28 +92,25 @@ struct OB10DemoView: View {
                         endPoint: .bottom
                     )
                 )
-                .frame(width: 260, height: 440)
+                .frame(width: 240, height: 320)
                 .shadow(color: .black.opacity(0.4), radius: 24, y: 12)
 
             VStack(spacing: 0) {
-                // Status bar spacer
-                Spacer().frame(height: 20)
-
                 // Clock
-                VStack(spacing: 4) {
+                VStack(spacing: 2) {
                     Text(currentTimeString)
-                        .font(.system(size: 64, weight: .ultraLight))
+                        .font(.system(size: 48, weight: .ultraLight))
                         .foregroundColor(.white)
                     Text(currentDateString)
-                        .font(.subheadline)
+                        .font(.caption)
                         .foregroundColor(.white.opacity(0.7))
                 }
-                .padding(.top, 16)
+                .padding(.top, 24)
 
                 Spacer()
 
                 // Live Activity container
-                VStack(spacing: 12) {
+                VStack(spacing: 10) {
                     HStack(spacing: 8) {
                         Image(systemName: "shield.fill")
                             .foregroundColor(.green)
@@ -129,30 +126,30 @@ struct OB10DemoView: View {
 
                     // THE BUTTON
                     Button(action: tapDemoButton) {
-                        HStack(spacing: 10) {
+                        HStack(spacing: 8) {
                             Image(systemName: "hand.thumbsup.fill")
-                                .font(.title3)
+                                .font(.subheadline)
                             Text("I'm OK")
-                                .font(.title3.bold())
+                                .font(.subheadline.bold())
                         }
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 14)
+                        .padding(.vertical, 12)
                         .background(Color.green)
                         .foregroundColor(.white)
-                        .cornerRadius(14)
+                        .cornerRadius(12)
                         .scaleEffect(pulseScale)
                     }
                     .buttonStyle(.plain)
                     .onAppear { startPulse() }
                 }
-                .padding(16)
+                .padding(14)
                 .background(Color.white.opacity(0.12))
-                .cornerRadius(20)
-                .padding(.horizontal, 16)
+                .cornerRadius(18)
+                .padding(.horizontal, 14)
 
-                Spacer().frame(height: 32)
+                Spacer().frame(height: 24)
             }
-            .frame(width: 260)
+            .frame(width: 240, height: 320)
         }
     }
 
