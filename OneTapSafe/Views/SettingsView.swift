@@ -190,6 +190,7 @@ struct SettingsView: View {
                     .buttonStyle(.plain)
                     
                     Link("Privacy Policy", destination: URL(string: "https://imentos.github.io/OneTapSafe/privacy-policy")!)
+                    Link("Terms of Use", destination: URL(string: "https://imentos.github.io/OneTapSafe/terms-of-use")!)
                 }
                 
                 if showDebugSection {

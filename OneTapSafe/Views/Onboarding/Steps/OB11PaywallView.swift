@@ -118,6 +118,13 @@ struct OB11PaywallView: View {
                     }
                     .font(.caption)
                     .foregroundColor(.secondary)
+
+                    HStack(spacing: 16) {
+                        Link("Terms of Use", destination: URL(string: "https://imentos.github.io/OneTapSafe/terms-of-use")!)
+                        Link("Privacy Policy", destination: URL(string: "https://imentos.github.io/OneTapSafe/privacy-policy")!)
+                    }
+                    .font(.caption)
+                    .foregroundColor(.secondary)
                 }
                 .padding(.bottom, 32)
             }
