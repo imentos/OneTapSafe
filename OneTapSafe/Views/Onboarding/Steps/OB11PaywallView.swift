@@ -113,6 +113,14 @@ struct OB11PaywallView: View {
                     .font(.subheadline)
                     .foregroundColor(.secondary)
 
+                    if let disclaimer = trialDisclaimer {
+                        Text(disclaimer)
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, 24)
+                    }
+
                     Button("Restore Purchases") {
                         Task { await subscriptionManager.restorePurchases() }
                     }
@@ -150,7 +158,16 @@ struct OB11PaywallView: View {
 
     private var ctaText: String {
         guard let p = selectedProduct else { return "Select a Plan" }
-        return "Start 7-Day Free Trial -- \(p.displayPrice)"
+        if p.id == SubscriptionManager.ProductID.annual.rawValue {
+            return "Try Free for 7 Days, then \(p.displayPrice)/year"
+        }
+        return "Subscribe for \(p.displayPrice)"
+    }
+
+    private var trialDisclaimer: String? {
+        guard let p = selectedProduct,
+              p.id == SubscriptionManager.ProductID.annual.rawValue else { return nil }
+        return "7-day free trial, then \(p.displayPrice)/year. Cancel anytime in Apple ID settings before trial ends to avoid charges."
     }
 
     private func savingsText(for product: Product) -> String? {
